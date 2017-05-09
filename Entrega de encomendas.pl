@@ -22,3 +22,72 @@ heuristica(ambos,IdPontoGrafo,Hseg) :-
 	heuristica(maxEntregas,IdPontoGrafo,Hseg1),
 	heuristica(minDist,IdPontoGrafo,Hseg2),
 	Hseg = (Hseg1 + Hseg2) / 2.
+
+/* Depth-First Search */
+df :-
+	estado_inicial(Ei),
+	estado_final(Ef),
+	df(Ei,Ef,[Ei],L),
+	write(L).
+
+df(Ef,Ef,L,L).
+df(Ea,Ef,Lant,L) :-
+	sucessor(Ea,Eseg),
+	\+ member(Eseg,Lant),
+	df(Eseg,Ef,[Eseg|Lant],L).
+
+/* Breath-First Search */
+bf :-
+	estado_inicial(Ei),
+	estado_final(Ef),
+	bf([[Ei]],Ef,L),
+	write(L).
+
+bf([La|_],Ef,La) :- La=[Ef|_].
+bf([La|OLs],Ef,L) :-
+	La=[Ea|OEs],
+	findall([Eseg|La],(sucessor(Ea,Eseg),\+ member(Eseg,OEs)),Lseg),
+	append(OLs,Lseg,NL),
+	bf(NL,Ef,L).
+
+/* Branch and bound */
+/* Iterative deepning */
+
+/* Hill climbing */
+hc :- solInicial(SolI),hc(SolI,1,Sol),write(Sol).
+hc(Sol,N,Sol) :- numIteracoes(N).
+hc(Sol,N,SolF) :- merito(Sol,V),
+	sucessor(Sol,Solseg),
+	merito(Solseg,Vseg), Vseg > V,
+	N1 is N + 1, hc(Solseg,N1,SolF).
+hc(Sol,_,Sol).
+
+/* A* */
+a_star :- estado_inicial(Ei),estado_final(Ef),Gi=0,heuristica(Ei,Hi),Fi=Hi,
+	CamIni=[Fi,Ei\Gi],a_star([CamIni],Ef,Res),write(Res).
+
+a_star([Cam1|OCams],Ef,Res) :- Cam1=[_,Ef\_|OEs],Res=Cam1.
+a_star([Cam1|OCams],Ef,Res) :- Cam1=[_,Ea\Ga|OEs],
+	findall([[[Fseg,Eseg\Gseg]|Ea\Ga]|OEs],
+		sucessor(Ea,Eseg,G),\+ member(Eseg\_,OEs),Gseg is G + Ga,
+		(heuristica(Eseg,Hseg),Fseg is Hseg + Gseg),NovosCams),
+	append(NovosCams,OCams,NCam),sort(NCam,NCamOrd),
+	a_star(NCamOrd,Ef,Res).
+
+/* Minimax */
+minimax(Ea) :- minimax(Ea,1,Max,Jogada,V),write(Jogada).
+
+minimax(Ea,Prof,Max,Jogada,V) :- \+ limite(Prof),
+	findall(Eseg,sucessor(Ea,Max,Eseg),Lseg),
+	MenorV is -9999,
+	maxValue(Lseg,Prof,MenorV,Jogada,V).
+
+minimax(Ea,_,_,Ea,V) :- merito(Ea,V).
+
+maxValue([],_,ME,MV,ME,MV).
+maxValue([E1|OEs],Prof,ME,MV,Eres,Vres) :-
+	Prof1 is Prof + 1,
+	minimax(E1,Prof1,Min,_,V1),
+	((V1 > MV,MVAux = V1,MEAux = E1)
+	;MVAux = MV, MEAux = ME),
+	maxValue(OEs,Prof,MEAux,MVAux,Eres,Vres).
