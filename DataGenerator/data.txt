@@ -1,0 +1,40 @@
+camiao(1, 110, 13000).
+
+pontoGrafo(1, 5, 45).
+pontoGrafo(2, 11, 41).
+pontoGrafo(3, 12, 14).
+pontoGrafo(4, 19, 24).
+pontoGrafo(5, 27, 36).
+pontoGrafo(6, 28, 8).
+pontoGrafo(7, 31, 27).
+pontoGrafo(8, 34, 0).
+pontoGrafo(9, 41, 4).
+pontoGrafo(10, 45, 42).
+
+pontoInicial(3).
+pontoFinal(4).
+
+pontoAbastecimento(10).
+
+encomenda(1, 12382, 17421, 7, 'Ruben Davis').
+
+sucessor(1, 2, 6.32456).
+sucessor(2, 1, 6.32456).
+sucessor(2, 5, 10.247).
+sucessor(5, 2, 10.247).
+sucessor(3, 5, 28.5307).
+sucessor(5, 3, 28.5307).
+sucessor(4, 8, 30.5941).
+sucessor(8, 4, 30.5941).
+sucessor(5, 9, 38.3667).
+sucessor(9, 5, 38.3667).
+sucessor(6, 7, 20.445).
+sucessor(7, 6, 20.445).
+sucessor(7, 10, 20.8567).
+sucessor(10, 7, 20.8567).
+sucessor(8, 2, 51.225).
+sucessor(2, 8, 51.225).
+sucessor(9, 10, 39.95).
+sucessor(10, 9, 39.95).
+sucessor(10, 3, 41.328).
+sucessor(3, 10, 41.328).

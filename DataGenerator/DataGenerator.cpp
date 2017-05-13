@@ -71,8 +71,8 @@ vector<Node> generateGraphPoints(ofstream &out, const int maxNumPoints)
 {
 	set<Node> graphPointsSet;
 	for (int id = 1; id <= maxNumPoints; id++) {
-		int longitude = rand() % 360;
-		int latitude = rand() % 360;
+		int longitude = rand() % 50;
+		int latitude = rand() % 50;
 		graphPointsSet.insert(Node(longitude, latitude));
 	}
 	vector<Node> graphPoints;
@@ -161,6 +161,7 @@ void generateSuccessors(ofstream &out, const int maxNumSuccessorsPerPoint, const
 			Node n2 = graphPoints[successorId - 1];
 			double cost = calculate_cost(n1, n2);
 			out << "sucessor(" << graphPointId << ", " << successorId << ", " << cost << ").\n";
+			out << "sucessor(" << successorId << ", " << graphPointId << ", " << cost << ").\n";
 		}
 	}
 }
