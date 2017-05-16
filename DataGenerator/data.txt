@@ -1,4 +1,4 @@
-camiao(1, 110, 13000).
+camiao(1, 150,13000).
 
 pontoGrafo(1, 5, 45).
 pontoGrafo(2, 11, 41).
@@ -15,8 +15,11 @@ pontoInicial(3).
 pontoFinal(4).
 
 pontoAbastecimento(10).
+pontoAbastecimento(2).
+pontoAbastecimento(5).
 
 encomenda(1, 12382, 17421, 7, 'Ruben Davis').
+encomenda(2, 500, 17421, 5, 'Ruben Davis').
 
 sucessor(1, 2, 6.32456).
 sucessor(2, 1, 6.32456).
