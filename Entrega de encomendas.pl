@@ -37,9 +37,8 @@ bombaMaisPerto_aux(bf,_Heuristica, Ei, [B1|Bs], [C1-B1|Cs]):-
 	bf(Ei, B1, C1,_),
 	bombaMaisPerto_aux(bf, _Heuristica, Ei, Bs, Cs).
 bombaMaisPerto_aux(astar, Heuristica, Ei, [B1|Bs], [CustoSemHeuristica-B1|Cs]):-
-	astar(Ei, B1, Heuristica, Caminho, Custo),
+	astar(Ei, B1, Heuristica, Caminho, _),
 	custoTotal(Caminho, CustoSemHeuristica),
-	write(Custo), write('-'), write(CustoSemHeuristica), nl,
 	bombaMaisPerto_aux(astar, Heuristica, Ei, Bs, Cs).
 
 	
@@ -79,7 +78,7 @@ df(Ea,Ef,Lant,L,Custo) :-
 	\+ member(Eseg,Lant),
 	df(Eseg,Ef,[Eseg|Lant],L, Custo2),
 	Custo is Custo2 + C.
-
+custoTotal([_], 0).
 custoTotal([P1,P2],Custo):-
 	sucessor(P1,P2,Custo).
 custoTotal([P1,P2|Ps], CustoTotal):-
@@ -139,7 +138,6 @@ minimo([X-A-C,Y-B-D|Tail], N, E, Custo):-
 entregaEncomendas_aux(_,_,_, [], []).
 entregaEncomendas_aux(Algoritmo, Heuristica, Ei,[E1|Es], [E1-Custo-Caminho|Rs]):-
 	((Algoritmo = df, df(Ei, E1, Custo, Caminho));(Algoritmo = astar, astar(Ei, E1, Heuristica, Caminho, Custo));(Algoritmo = bf, bf(Ei, E1, Custo, Caminho))),
-	write('oloolololo'),nl,
 	entregaEncomendas_aux(Algoritmo, Heuristica, Ei, Es, Rs).
 
 
@@ -147,15 +145,10 @@ entregaEncomendas_aux(Algoritmo, Heuristica, Ei,[E1|Es], [E1-Custo-Caminho|Rs]):
 entregaEncomendas_aux_2(_,_,_, [],[],_).
 
 entregaEncomendas_aux_2(Algoritmo, Heuristica, Ei, Encomendas, [C|R], Autonomia):-
-	write('Ei '), write(Ei), nl, 
 	entregaEncomendas_aux(Algoritmo, Heuristica, Ei,  Encomendas, Resultado),
-	write('oli'), nl,
-	write(Resultado), nl,
 	minimo(Resultado, Min, C, Custo),
 	Custo =< Autonomia,
-	write('ola'),
 	Autonomia2 is Autonomia - Custo,
-	write('oola2'),
 	delete(Encomendas, Min, Resto),
 	entregaEncomendas_aux_2(Algoritmo,Heuristica,Min, Resto, R, Autonomia2).
 
@@ -165,12 +158,9 @@ entregaEncomendas_aux_2(Algoritmo, Heuristica, Ei, Encomendas, [Caminho2|R], Aut
 	Custo > Autonomia,
 	camiao(_,AutonomiaInicial,_),
 	bombaMaisPerto(Algoritmo, Heuristica,Ei, Ef, CustoBomba),
-	write(Ei), write('-'), write(Ef), write('-'), write(AutonomiaInicial), write('-'), write(CustoBomba), nl,
 	(AutonomiaInicial > CustoBomba ->
-	(AutonomiaInicial > CustoBomba, Ei \= Ef, write('cheguei'));(write('Caminho impossivel'), nl, !, abort)),
+	(AutonomiaInicial > CustoBomba, Ei \= Ef);(write('Caminho impossivel'), nl, !, abort)),
 	((Algoritmo = df, df(Ei, Ef, _, Caminho2));(Algoritmo = astar, astar(Ei, Ef, Heuristica, Caminho2,_)); (Algoritmo = bf, bf(Ei, Ef,_,Caminho2))),
-	write(Caminho2), nl,
-	write(Encomendas), nl,
 	entregaEncomendas_aux_2(Algoritmo, Heuristica, Ef, Encomendas, R, AutonomiaInicial).
 	
 entregaEncomendas(astar, Heuristica):-
@@ -179,6 +169,14 @@ entregaEncomendas(df):-
 	entregaEncomendas_Geral(df, _).
 entregaEncomendas(bf):-
 	entregaEncomendas_Geral(bf, _).
+
+cleanList([P1,P2],[P1, P2]):- P1 \= P2.
+cleanList([P,P], [P]).
+cleanList([P1, P2|Ps], [P1|Tail]):-
+	P1 \= P2,
+	cleanList([P2|Ps], Tail).
+cleanList([P1,P1|Ps], Tail):-
+	cleanList([P1|Ps], Tail).
 	
 entregaEncomendas_Geral(Algoritmo, Heuristica):-
 	todasEncomendas(EncomendasTemp),
@@ -193,5 +191,10 @@ entregaEncomendas_Geral(Algoritmo, Heuristica):-
 	nth1(Val2, Ultima, UltimaEntrega),
 	EncomendasF = [Ef],
 	entregaEncomendas_aux_2(Algoritmo, Heuristica, UltimaEntrega, EncomendasF, Caminho, Autonomia),
-	append(C, Caminho, Final), write(Final).
+	append(C, Caminho, Final), 
+	append(Final, Ex),
+	cleanList(Ex, Cleaned),
+	custoTotal(Cleaned, CustoFinal),
+	write('Custo: '), write(CustoFinal), nl,
+	write('Caminho: '), write(Final).
 	
