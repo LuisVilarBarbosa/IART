@@ -8,7 +8,7 @@ encomenda(Id, Volume, Valor, IdPontoEntrega, Cliente).
 sucessor(IdPontoGrafo, IdSucessor, Custo).
 */
 
-:- load_files('DataGenerator/data.txt').
+:- load_files(data).
 
 :- use_module(library(lists)).
 
