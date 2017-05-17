@@ -18,54 +18,63 @@ todasEncomendas_aux([Vol-Ind|Res], [Ind|Tail], Total, CargaMaxima):-
 	Total2 is Total + Vol,
 	Total2 =< CargaMaxima,
 	todasEncomendas_aux(Res, Tail, Total2, CargaMaxima).
-
-todasEncomendas(Final):-
+todasEncomendas_aux2(_,[],_,[]).
+todasEncomendas_aux2(Ei, [Vol-Enc1|Encs], Algoritmo, [Custo-Vol-Enc1|Tail]):-
+	((Algoritmo = df, df(Ei, Enc1, Custo, Caminho));(Algoritmo = astar, astar(Ei, Enc1, Caminho, Custo));
+	(Algoritmo = bf, bf(Ei, Enc1, Custo, Caminho));(Algoritmo = idastar, idastar(Ei, Enc1, Custo, Caminho))),
+	todasEncomendas_aux2(Ei, Encs, Algoritmo, Tail).
+	
+auxiliar(_,[],_,[]).
+auxiliar(Ei, Encomendas, Algoritmo, [V-Ponto|Tail]):-
+	todasEncomendas_aux2(Ei, Encomendas, Algoritmo, MaisProximas),
+	sort(MaisProximas, OrdMaisProximas),
+	nth0(0, OrdMaisProximas, _-V-Ponto),
+	delete(Encomendas,_-Ponto, Restantes),
+	auxiliar(Ponto, Restantes, Algoritmo, Tail).
+	
+todasEncomendas(Final, Opcao, Algoritmo):-
 	findall(Volume-PontoGrafo, encomenda(_,Volume,_,PontoGrafo,_), Encomendas),
-	sort(Encomendas, Temp),
-	reverse(Temp, Ord),
+	pontoInicial(Ei),
+	((Opcao = maxEntregas, sort(Encomendas, Temp));
+	(Opcao = minDist, auxiliar(Ei, Encomendas, Algoritmo, Temp))),
 	camiao(_,_,CargaMaxima),
-	todasEncomendas_aux(Ord, Final, 0, CargaMaxima).
+	todasEncomendas_aux(Temp, Final, 0, CargaMaxima).
 
 todasBombas(Bombas):-
 	findall(Id, pontoAbastecimento(Id), Bombas).
 
-bombaMaisPerto_aux(_,_Heuristica, _,[],[]).	
-bombaMaisPerto_aux(df,_Heuristica, Ei, [B1|Bs], [C1-B1|Cs]):-
+bombaMaisPerto_aux(_, _,[],[]).	
+bombaMaisPerto_aux(df, Ei, [B1|Bs], [C1-B1|Cs]):-
 	df(Ei, B1, C1,_),
-	bombaMaisPerto_aux(df, _Heuristica, Ei, Bs, Cs).
-bombaMaisPerto_aux(bf,_Heuristica, Ei, [B1|Bs], [C1-B1|Cs]):-
+	bombaMaisPerto_aux(df, Ei, Bs, Cs).
+bombaMaisPerto_aux(bf, Ei, [B1|Bs], [C1-B1|Cs]):-
 	bf(Ei, B1, C1,_),
-	bombaMaisPerto_aux(bf, _Heuristica, Ei, Bs, Cs).
-bombaMaisPerto_aux(astar, Heuristica, Ei, [B1|Bs], [CustoSemHeuristica-B1|Cs]):-
-	astar(Ei, B1, Heuristica, Caminho, _),
+	bombaMaisPerto_aux(bf, Ei, Bs, Cs).
+bombaMaisPerto_aux(astar, Ei, [B1|Bs], [CustoSemHeuristica-B1|Cs]):-
+	astar(Ei, B1, Caminho, _),
 	custoTotal(Caminho, CustoSemHeuristica),
-	bombaMaisPerto_aux(astar, Heuristica, Ei, Bs, Cs).
+	bombaMaisPerto_aux(astar, Ei, Bs, Cs).
 
 	
 
-bombaMaisPerto(Algoritmo, Heuristica, Ei, Ef, Custo):-
+bombaMaisPerto(Algoritmo, Ei, Ef, Custo):-
 	todasBombas(Bombas),
-	bombaMaisPerto_aux(Algoritmo, Heuristica, Ei, Bombas, Custos),
+	bombaMaisPerto_aux(Algoritmo, Ei, Bombas, Custos),
 	sort(Custos, Ord),
 	nth0(0, Ord, Custo-Ef).
 
 
-heuristica(maxEntregas,IdPontoGrafo,Hseg) :-
+
+
+heuristica(IdPontoGrafo,Hseg) :-
 	pontoFinal(IdPontoFinal),
 	pontoGrafo(IdPontoFinal,Long1,Lat1),
 	pontoGrafo(IdPontoGrafo,Long2,Lat2),
-	Hseg is max(abs(Long2-Long1),abs(Lat2-Lat1)).
+	Long is abs(Long2 - Long1),
+	Lat is abs(Lat2 - Lat1),
+	Hseg is sqrt(Long*Long + Lat*Lat).
 
-heuristica(minDist,IdPontoGrafo,Hseg) :-
-	pontoFinal(IdPontoFinal),
-	pontoGrafo(IdPontoFinal,Long1,Lat1),
-	pontoGrafo(IdPontoGrafo,Long2,Lat2),
-	Hseg is min(abs(Long2-Long1),abs(Lat2-Lat1)).
 
-heuristica(ambos,IdPontoGrafo,Hseg) :-
-	heuristica(maxEntregas,IdPontoGrafo,Hseg1),
-	heuristica(minDist,IdPontoGrafo,Hseg2),
-	Hseg is (Hseg1 + Hseg2) / 2.
 
 /* Depth-First Search */
 df(Ei, Ef, Custo, Final):-
@@ -101,31 +110,20 @@ bf([La|OLs],Ef,L) :-
 /* Branch and bound */
 /* Iterative deepning */
 
-/* Hill climbing */
-numIteracoes(1000).	% be careful with this limit
-
-hc :- solInicial(SolI),hc(SolI,1,Sol),write(Sol).
-hc(Sol,N,Sol) :- numIteracoes(N).
-hc(Sol,N,SolF) :- merito(Sol,V),
-	sucessor(Sol,Solseg),
-	merito(Solseg,Vseg), Vseg > V,
-	N1 is N + 1, hc(Solseg,N1,SolF).
-hc(Sol,_,Sol).
-
 /* A* */
-astar(PontoInicial, PontoFinal, Heuristica, S, C):-
-    heuristica(Heuristica, PontoInicial, Hi),
-    astar(_PontoInicial, PontoFinal,Heuristica, [Hi-[PontoInicial]-0], Si, C), reverse(Si, S).
+astar(PontoInicial, PontoFinal, S, C):-
+    heuristica(PontoInicial, Hi),
+    astar(_PontoInicial, PontoFinal, [Hi-[PontoInicial]-0], Si, C), reverse(Si, S).
 
-astar(_PontoInicial, E, _Heuristica,[C-[E|Cam]-_|_], [E|Cam], C):- !.
+astar(_PontoInicial, E, [C-[E|Cam]-_|_], [E|Cam], C):- !.
 
-astar(_PontoInicial, PontoFinal, Heuristica, [_-[E|Cam]-G|R], S, C):-
+astar(_PontoInicial, PontoFinal, [_-[E|Cam]-G|R], S, C):-
     findall(F2-[E2|[E|Cam]]-G2,
-        (sucessor(E, E2, C), G2 is G + C, heuristica(Heuristica,E2, H2), F2 is G2 + H2 ),
+        (sucessor(E, E2, C), G2 is G + C, heuristica(E2, H2), F2 is G2 + H2 ),
         Lsuc),
     append(R, Lsuc, L),
     sort(L, Lord),
-    astar(_PontoInicial, PontoFinal, Heuristica,Lord, S, C).
+    astar(_PontoInicial, PontoFinal, Lord, S, C).
 
 minimo([X-Custo-C],X, C, Custo):- !.
 minimo([X-A-C,Y-B-D|Tail], N, E, Custo):-
@@ -135,40 +133,33 @@ minimo([X-A-C,Y-B-D|Tail], N, E, Custo):-
 
 		
 	
-entregaEncomendas_aux(_,_,_, [], []).
-entregaEncomendas_aux(Algoritmo, Heuristica, Ei,[E1|Es], [E1-Custo-Caminho|Rs]):-
-	((Algoritmo = df, df(Ei, E1, Custo, Caminho));(Algoritmo = astar, astar(Ei, E1, Heuristica, Caminho, Custo));(Algoritmo = bf, bf(Ei, E1, Custo, Caminho))),
-	entregaEncomendas_aux(Algoritmo, Heuristica, Ei, Es, Rs).
+entregaEncomendas_aux(_,_, [], []).
+entregaEncomendas_aux(Algoritmo, Ei,[E1|Es], [E1-Custo-Caminho|Rs]):-
+	((Algoritmo = df, df(Ei, E1, Custo, Caminho));(Algoritmo = astar, astar(Ei, E1, Caminho, Custo));(Algoritmo = bf, bf(Ei, E1, Custo, Caminho));(Algoritmo = idastar, idastar(Ei, E1, Custo, Caminho))),
+	entregaEncomendas_aux(Algoritmo, Ei, Es, Rs).
 
 
 
-entregaEncomendas_aux_2(_,_,_, [],[],_).
+entregaEncomendas_aux_2(_,_, [],[],_).
 
-entregaEncomendas_aux_2(Algoritmo, Heuristica, Ei, Encomendas, [C|R], Autonomia):-
-	entregaEncomendas_aux(Algoritmo, Heuristica, Ei,  Encomendas, Resultado),
+entregaEncomendas_aux_2(Algoritmo, Ei, Encomendas, [C|R], Autonomia):-
+	entregaEncomendas_aux(Algoritmo, Ei,  Encomendas, Resultado),
 	minimo(Resultado, Min, C, Custo),
 	Custo =< Autonomia,
 	Autonomia2 is Autonomia - Custo,
 	delete(Encomendas, Min, Resto),
-	entregaEncomendas_aux_2(Algoritmo,Heuristica,Min, Resto, R, Autonomia2).
+	entregaEncomendas_aux_2(Algoritmo,Min, Resto, R, Autonomia2).
 
-entregaEncomendas_aux_2(Algoritmo, Heuristica, Ei, Encomendas, [Caminho2|R], Autonomia):-
-	entregaEncomendas_aux(Algoritmo, Heuristica, Ei, Encomendas, Resultado),
+entregaEncomendas_aux_2(Algoritmo, Ei, Encomendas, [Caminho2|R], Autonomia):-
+	entregaEncomendas_aux(Algoritmo, Ei, Encomendas, Resultado),
 	minimo(Resultado, _, _, Custo),
 	Custo > Autonomia,
 	camiao(_,AutonomiaInicial,_),
-	bombaMaisPerto(Algoritmo, Heuristica,Ei, Ef, CustoBomba),
+	bombaMaisPerto(Algoritmo, Ei, Ef, CustoBomba),
 	(AutonomiaInicial > CustoBomba ->
 	(AutonomiaInicial > CustoBomba, Ei \= Ef);(write('Caminho impossivel'), nl, !, abort)),
-	((Algoritmo = df, df(Ei, Ef, _, Caminho2));(Algoritmo = astar, astar(Ei, Ef, Heuristica, Caminho2,_)); (Algoritmo = bf, bf(Ei, Ef,_,Caminho2))),
-	entregaEncomendas_aux_2(Algoritmo, Heuristica, Ef, Encomendas, R, AutonomiaInicial).
-	
-entregaEncomendas(astar, Heuristica):-
-	entregaEncomendas_Geral(astar, Heuristica).
-entregaEncomendas(df):-
-	entregaEncomendas_Geral(df, _).
-entregaEncomendas(bf):-
-	entregaEncomendas_Geral(bf, _).
+	((Algoritmo = df, df(Ei, Ef, _, Caminho2));(Algoritmo = astar, astar(Ei, Ef, Caminho2,_)); (Algoritmo = bf, bf(Ei, Ef,_,Caminho2));;(Algoritmo = idastar, idastar(Ei, Ef, Custo, Caminho2))),
+	entregaEncomendas_aux_2(Algoritmo, Ef, Encomendas, R, AutonomiaInicial).
 
 cleanList([P1,P2],[P1, P2]):- P1 \= P2.
 cleanList([P,P], [P]).
@@ -178,19 +169,70 @@ cleanList([P1, P2|Ps], [P1|Tail]):-
 cleanList([P1,P1|Ps], Tail):-
 	cleanList([P1|Ps], Tail).
 	
-entregaEncomendas_Geral(Algoritmo, Heuristica):-
-	todasEncomendas(EncomendasTemp),
+/* IDA* */
+
+% idastar( Start, Solution):
+%   Perform IDA* search; Start is the start node, Solution is solution path
+
+idastar(Ei, Ef, Custo, Caminho)  :-
+  retract(next_bound(_)), fail     % Clear next_bound
+  ;
+  asserta(next_bound(0)),         % Initialise bound
+  idastar0(Ei, Ef, Solution),
+  reverse(Solution, Caminho),
+  custoTotal(Caminho, Custo).
+  
+idastar0(Ei, Ef, Sol)  :-
+  retract( next_bound( Bound)),     % Current bound
+  asserta( next_bound( 99999)),     % Initialise next bound
+  heuristica(Ei, F),                     % f-value of start node
+  df1( [Ei],Ef, F, Bound, Sol)       % Find solution; if not, change bound
+  ;
+  next_bound( NextBound),
+  NextBound < 99999,               % Bound finite
+  idastar0( Ei, Ef, Sol).           % Try with new bound
+
+% df( Path, F, Bound, Sol):
+%  Perform depth-first search within Bound
+%  Path is the path from start node so far (in reverse order)
+%  F is the f-value of the current node, i.e. the head of Path
+
+df1( [N | Ns], N, F, Bound, [N | Ns])  :-
+  F =< Bound.                        % Succeed: solution found
+
+df1( [N | Ns], Ef, F, Bound, Sol)  :-
+  F =< Bound,                      % Node N within f-bound
+  sucessor( N, N1, _), \+member( N1, Ns),   % Expand N
+  heuristica(N1, F1),
+  df1( [N1,N | Ns], Ef, F1, Bound, Sol).
+
+df1( _, _,F, Bound, _)  :-
+  F > Bound,                       % Beyond Bound
+  update_next_bound( F),           % Just update next bound
+  fail.                            % and fail
+
+update_next_bound( F)  :-
+  next_bound( Bound),
+  Bound =< F, !                      % Do not change next bound
+  ;
+  retract( next_bound( Bound)), !,   % Lower next bound
+  asserta( next_bound( F)).
+	
+	
+entregaEncomendas(Algoritmo, Opcao):-
+	todasEncomendas(EncomendasTemp, Opcao, Algoritmo),
 	sort(EncomendasTemp, Encomendas),
+	write('Pontos de entrega: '), write(Encomendas),nl,
 	camiao(_,Autonomia,_),
 	pontoInicial(Ei),
 	pontoFinal(Ef),
-	entregaEncomendas_aux_2(Algoritmo, Heuristica, Ei, Encomendas, C, Autonomia),
+	entregaEncomendas_aux_2(Algoritmo, Ei, Encomendas, C, Autonomia),
 	length(C, Val),
 	nth1(Val, C, Ultima),
 	length(Ultima, Val2),
 	nth1(Val2, Ultima, UltimaEntrega),
 	EncomendasF = [Ef],
-	entregaEncomendas_aux_2(Algoritmo, Heuristica, UltimaEntrega, EncomendasF, Caminho, Autonomia),
+	entregaEncomendas_aux_2(Algoritmo, UltimaEntrega, EncomendasF, Caminho, Autonomia),
 	append(C, Caminho, Final), 
 	append(Final, Ex),
 	cleanList(Ex, Cleaned),
