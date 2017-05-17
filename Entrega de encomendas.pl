@@ -134,8 +134,12 @@ todasEncomendas_aux([Vol-Ind|Res], [Ind|Tail], Total, CargaMaxima):-
 	todasEncomendas_aux(Res, Tail, Total2, CargaMaxima).
 todasEncomendas_aux2(_,[],_,[]).
 todasEncomendas_aux2(Ei, [Vol-Enc1|Encs], Algoritmo, [Custo-Vol-Enc1|Tail]):-
-	((Algoritmo = df, df(Ei, Enc1, Custo, Caminho));(Algoritmo = astar, astar(Ei, Enc1, Caminho, Custo));
-	(Algoritmo = bf, bf(Ei, Enc1, Custo, Caminho));(Algoritmo = idastar, idastar(Ei, Enc1, Custo, Caminho))),
+	(
+		(Algoritmo = df, df(Ei, Enc1, Custo, Caminho));
+		(Algoritmo = astar, astar(Ei, Enc1, Caminho, Custo));
+		(Algoritmo = bf, bf(Ei, Enc1, Custo, Caminho));
+		(Algoritmo = idastar, idastar(Ei, Enc1, Custo, Caminho))
+	),
 	todasEncomendas_aux2(Ei, Encs, Algoritmo, Tail).
 	
 auxiliar(_,[],_,[]).
@@ -149,8 +153,10 @@ auxiliar(Ei, Encomendas, Algoritmo, [V-Ponto|Tail]):-
 todasEncomendas(Final, Opcao, Algoritmo):-
 	findall(Volume-PontoGrafo, encomenda(_,Volume,_,PontoGrafo,_), Encomendas),
 	pontoInicial(Ei),
-	((Opcao = maxEntregas, sort(Encomendas, Temp));
-	(Opcao = minDist, auxiliar(Ei, Encomendas, Algoritmo, Temp))),
+	(
+		(Opcao = maxEntregas, sort(Encomendas, Temp));
+		(Opcao = minDist, auxiliar(Ei, Encomendas, Algoritmo, Temp))
+	),
 	camiao(_,_,CargaMaxima),
 	todasEncomendas_aux(Temp, Final, 0, CargaMaxima).
 
@@ -179,13 +185,19 @@ bombaMaisPerto(Algoritmo, Ei, Ef, Custo):-
 
 minimo([X-Custo-C],X, C, Custo):- !.
 minimo([X-A-C,Y-B-D|Tail], N, E, Custo):-
-	( A > B ->
-		minimo([Y-B-D|Tail], N, E, Custo);
-		minimo([X-A-C|Tail], N, E, Custo)).
+	(
+		(A > B, minimo([Y-B-D|Tail], N, E, Custo));
+		minimo([X-A-C|Tail], N, E, Custo)
+	).
 
 entregaEncomendas_aux(_,_, [], []).
 entregaEncomendas_aux(Algoritmo, Ei,[E1|Es], [E1-Custo-Caminho|Rs]):-
-	((Algoritmo = df, df(Ei, E1, Custo, Caminho));(Algoritmo = astar, astar(Ei, E1, Caminho, Custo));(Algoritmo = bf, bf(Ei, E1, Custo, Caminho));(Algoritmo = idastar, idastar(Ei, E1, Custo, Caminho))),
+	(
+		(Algoritmo = df, df(Ei, E1, Custo, Caminho));
+		(Algoritmo = astar, astar(Ei, E1, Caminho, Custo));
+		(Algoritmo = bf, bf(Ei, E1, Custo, Caminho));
+		(Algoritmo = idastar, idastar(Ei, E1, Custo, Caminho))
+	),
 	entregaEncomendas_aux(Algoritmo, Ei, Es, Rs).
 
 entregaEncomendas_aux_2(_,_, [],[],_).
@@ -202,9 +214,16 @@ entregaEncomendas_aux_2(Algoritmo, Ei, Encomendas, [Caminho2|R], Autonomia):-
 	Custo > Autonomia,
 	camiao(_,AutonomiaInicial,_),
 	bombaMaisPerto(Algoritmo, Ei, Ef, CustoBomba),
-	(AutonomiaInicial > CustoBomba ->
-	(AutonomiaInicial > CustoBomba, Ei \= Ef);(write('Caminho impossivel'), nl, !, abort)),
-	((Algoritmo = df, df(Ei, Ef, _, Caminho2));(Algoritmo = astar, astar(Ei, Ef, Caminho2,_)); (Algoritmo = bf, bf(Ei, Ef,_,Caminho2));;(Algoritmo = idastar, idastar(Ei, Ef, Custo, Caminho2))),
+	(
+		(AutonomiaInicial > CustoBomba, AutonomiaInicial > CustoBomba, Ei \= Ef);
+		(write('Caminho impossivel'), nl, !, abort)
+	),
+	(
+		(Algoritmo = df, df(Ei, Ef, _, Caminho2));
+		(Algoritmo = astar, astar(Ei, Ef, Caminho2,_));
+		(Algoritmo = bf, bf(Ei, Ef,_,Caminho2));
+		(Algoritmo = idastar, idastar(Ei, Ef, Custo, Caminho2))
+	),
 	entregaEncomendas_aux_2(Algoritmo, Ef, Encomendas, R, AutonomiaInicial).
 
 
