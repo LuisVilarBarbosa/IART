@@ -74,6 +74,8 @@ astar(PontoInicial,PontoFinal,[_-[E|Cam]-G|R],S,C):-
 /* IDA* */
 idastar(Ei,Ef,Custo,Caminho) :-
     retract(next_bound(_)),
+	fail
+	;
     asserta(next_bound(0)),
     idastarAux(Ei,Ef,L),
     reverse(L,Caminho),
@@ -83,7 +85,8 @@ idastarAux(Ei,Ef,L)  :-
     retract(next_bound(Bound)),
     asserta(next_bound(100000)),
     heuristica(Ei,Hi),
-    df1([Ei],Ef,Hi,Bound,L);
+    df1([Ei],Ef,Hi,Bound,L)
+	;
     next_bound(NextBound),
     NextBound < 100000,
     idastarAux(Ei,Ef,L).
@@ -99,16 +102,13 @@ df1(_,_,H,Bound,_) :-
     update_next_bound(H),
     fail.
 update_next_bound(H) :-
-    (
-        next_bound(Bound),
-        Bound =< H,
-        !
-    );
-    (
-        retract(next_bound(Bound)),
-        !,
-        asserta(next_bound(H))
-	).
+    next_bound(Bound),
+    Bound =< H,
+    !
+    ;
+    retract(next_bound(Bound)),
+    !,
+    asserta(next_bound(H)).
 
 
 /* Entrega de encomendas */
