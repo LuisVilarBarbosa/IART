@@ -12,33 +12,32 @@ sucessor(IdPontoGrafo, IdSucessor, Custo).
 
 :- use_module(library(lists)).
 
-
 /* Depth-First Search */
-df(Ei, Ef, Custo, Final):-
-	df(Ei,Ef,[Ei],L, Custo),
-	reverse(L, Final).
+df(Ei,Ef,Custo,Caminho):-
+	df(Ei,Ef,[Ei],L,Custo),
+	reverse(L,Caminho).
 
-df(Ef,Ef,L,L, 0).
+df(Ef,Ef,L,L,0).
 df(Ea,Ef,Lant,L,Custo) :-
 	sucessor(Ea,Eseg,C),
 	\+ member(Eseg,Lant),
-	df(Eseg,Ef,[Eseg|Lant],L, Custo2),
+	df(Eseg,Ef,[Eseg|Lant],L,Custo2),
 	Custo is Custo2 + C.
 
 
 /* Breath-First Search */
-custoTotal([_], 0).
-custoTotal([P1,P2],Custo):-
+custoTotal([_],0).
+custoTotal([P1,P2],Custo) :-
 	sucessor(P1,P2,Custo).
-custoTotal([P1,P2|Ps], CustoTotal):-
-	sucessor(P1,P2, Custo),
-	custoTotal([P2|Ps], CustoTotal2),
+custoTotal([P1,P2|Ps],CustoTotal):-
+	sucessor(P1,P2,Custo),
+	custoTotal([P2|Ps],CustoTotal2),
 	CustoTotal is Custo + CustoTotal2.
 
-bf(Ei, Ef, Custo, Final):-
+bf(Ei,Ef,Custo,Caminho) :-
 	bf([[Ei]],Ef,L),
-	reverse(L, Final),
-	custoTotal(Final, Custo).
+	reverse(L,Caminho),
+	custoTotal(Caminho,Custo).
 
 bf([La|_],Ef,La) :- La=[Ef|_].
 bf([La|OLs],Ef,L) :-
@@ -55,57 +54,46 @@ heuristica(IdPontoGrafo,Hseg) :-
 	pontoGrafo(IdPontoGrafo,Long2,Lat2),
 	Long is abs(Long2 - Long1),
 	Lat is abs(Lat2 - Lat1),
-	Hseg is sqrt(Long*Long + Lat*Lat).
+	Hseg is sqrt(Long * Long + Lat * Lat).
 
-astar(PontoInicial, PontoFinal, S, C):-
-    heuristica(PontoInicial, Hi),
-    astar(_PontoInicial, PontoFinal, [Hi-[PontoInicial]-0], Si, C), reverse(Si, S).
+astar(PontoInicial,PontoFinal,Caminho,Custo) :-
+    heuristica(PontoInicial,Hi),
+    astar(PontoInicial, PontoFinal,[Hi-[PontoInicial]-0],L,Custo),
+	reverse(L,Caminho).
 
-astar(_PontoInicial, E, [C-[E|Cam]-_|_], [E|Cam], C):- !.
-
-astar(_PontoInicial, PontoFinal, [_-[E|Cam]-G|R], S, C):-
+astar(_PontoInicial,E,[C-[E|Cam]-_|_],[E|Cam],C) :- !.
+astar(PontoInicial,PontoFinal,[_-[E|Cam]-G|R],S,C):-
     findall(F2-[E2|[E|Cam]]-G2,
-        (sucessor(E, E2, C), G2 is G + C, heuristica(E2, H2), F2 is G2 + H2 ),
+        (sucessor(E,E2,C),G2 is G + C,heuristica(E2,H2),F2 is G2 + H2),
         Lsuc),
-    append(R, Lsuc, L),
-    sort(L, Lord),
-    astar(_PontoInicial, PontoFinal, Lord, S, C).
+    append(R,Lsuc,L),
+    sort(L,Lord),
+    astar(PontoInicial,PontoFinal,Lord,S,C).
 
 
 /* IDA* */
-
-% idastar( Start, Solution):
-%   Perform IDA* search; Start is the start node, Solution is solution path
-
-idastar(Ei, Ef, Custo, Caminho)  :-
-  retract(next_bound(_)), fail     % Clear next_bound
-  ;
-  asserta(next_bound(0)),         % Initialise bound
-  idastar0(Ei, Ef, Solution),
-  reverse(Solution, Caminho),
-  custoTotal(Caminho, Custo).
+idastar(Ei,Ef,Custo,Caminho) :-
+  retract(next_bound(_)),
+  asserta(next_bound(0)),
+  idastarAux(Ei,Ef,L),
+  reverse(L,Caminho),
+  custoTotal(Caminho,Custo).
   
-idastar0(Ei, Ef, Sol)  :-
-  retract( next_bound( Bound)),     % Current bound
-  asserta( next_bound( 99999)),     % Initialise next bound
-  heuristica(Ei, F),                     % f-value of start node
-  df1( [Ei],Ef, F, Bound, Sol)       % Find solution; if not, change bound
-  ;
-  next_bound( NextBound),
-  NextBound < 99999,               % Bound finite
-  idastar0( Ei, Ef, Sol).           % Try with new bound
-
-% df( Path, F, Bound, Sol):
-%  Perform depth-first search within Bound
-%  Path is the path from start node so far (in reverse order)
-%  F is the f-value of the current node, i.e. the head of Path
+idastarAux(Ei,Ef,L)  :-
+  retract(next_bound(Bound)),
+  asserta(next_bound(100000)),
+  heuristica(Ei,Hi),
+  df1([Ei],Ef,Hi,Bound,L);
+  next_bound(NextBound),
+  NextBound < 100000,
+  idastarAux(Ei,Ef,L).
 
 df1( [N | Ns], N, F, Bound, [N | Ns])  :-
   F =< Bound.                        % Succeed: solution found
 
 df1( [N | Ns], Ef, F, Bound, Sol)  :-
   F =< Bound,                      % Node N within f-bound
-  sucessor( N, N1, _), \+member( N1, Ns),   % Expand N
+  sucessor( N, N1, _),\+ member( N1, Ns),   % Expand N
   heuristica(N1, F1),
   df1( [N1,N | Ns], Ef, F1, Bound, Sol).
 
