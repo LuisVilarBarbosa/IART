@@ -73,41 +73,42 @@ astar(PontoInicial,PontoFinal,[_-[E|Cam]-G|R],S,C):-
 
 /* IDA* */
 idastar(Ei,Ef,Custo,Caminho) :-
-  retract(next_bound(_)),
-  asserta(next_bound(0)),
-  idastarAux(Ei,Ef,L),
-  reverse(L,Caminho),
-  custoTotal(Caminho,Custo).
+    retract(next_bound(_)),
+    asserta(next_bound(0)),
+    idastarAux(Ei,Ef,L),
+    reverse(L,Caminho),
+    custoTotal(Caminho,Custo).
   
 idastarAux(Ei,Ef,L)  :-
-  retract(next_bound(Bound)),
-  asserta(next_bound(100000)),
-  heuristica(Ei,Hi),
-  df1([Ei],Ef,Hi,Bound,L);
-  next_bound(NextBound),
-  NextBound < 100000,
-  idastarAux(Ei,Ef,L).
+    retract(next_bound(Bound)),
+    asserta(next_bound(100000)),
+    heuristica(Ei,Hi),
+    df1([Ei],Ef,Hi,Bound,L);
+    next_bound(NextBound),
+    NextBound < 100000,
+    idastarAux(Ei,Ef,L).
 
-df1( [N | Ns], N, F, Bound, [N | Ns])  :-
-  F =< Bound.                        % Succeed: solution found
-
-df1( [N | Ns], Ef, F, Bound, Sol)  :-
-  F =< Bound,                      % Node N within f-bound
-  sucessor( N, N1, _),\+ member( N1, Ns),   % Expand N
-  heuristica(N1, F1),
-  df1( [N1,N | Ns], Ef, F1, Bound, Sol).
-
-df1( _, _,F, Bound, _)  :-
-  F > Bound,                       % Beyond Bound
-  update_next_bound( F),           % Just update next bound
-  fail.                            % and fail
-
-update_next_bound( F)  :-
-  next_bound( Bound),
-  Bound =< F, !                      % Do not change next bound
-  ;
-  retract( next_bound( Bound)), !,   % Lower next bound
-  asserta( next_bound( F)).
+df1([E|OEs],E,H,Bound,[E|OEs]) :- H =< Bound.
+df1([E|OEs],Ef,H,Bound,Sol) :-
+    H =< Bound,
+    sucessor(E,Esuc,_),\+ member(Esuc,OEs),
+    heuristica(Esuc,Hsuc),
+    df1([Esuc,E|OEs],Ef,Hsuc,Bound,Sol).
+df1(_,_,H,Bound,_) :-
+    H > Bound,
+    update_next_bound(H),
+    fail.
+update_next_bound(H) :-
+    (
+        next_bound(Bound),
+        Bound =< H,
+        !
+    );
+    (
+        retract(next_bound(Bound)),
+        !,
+        asserta(next_bound(H))
+	).
 
 
 /* Entrega de encomendas */
@@ -120,6 +121,7 @@ todasEncomendas_aux([Vol-Ind|Res], [Ind|Tail], Total, CargaMaxima):-
 	Total2 is Total + Vol,
 	Total2 =< CargaMaxima,
 	todasEncomendas_aux(Res, Tail, Total2, CargaMaxima).
+
 todasEncomendas_aux2(_,[],_,[]).
 todasEncomendas_aux2(Ei, [Vol-Enc1|Encs], Algoritmo, [Custo-Vol-Enc1|Tail]):-
 	(
