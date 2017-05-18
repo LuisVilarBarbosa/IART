@@ -175,6 +175,10 @@ bombaMaisPerto_aux(astar, Ei, [B1|Bs], [CustoSemHeuristica-B1|Cs]):-
 	astar(Ei, B1, Caminho, _),
 	custoTotal(Caminho, CustoSemHeuristica),
 	bombaMaisPerto_aux(astar, Ei, Bs, Cs).
+bombaMaisPerto_aux(idastar, Ei, [B1|Bs], [CustoSemHeuristica-B1|Cs]):-
+	idastar(Ei, B1, _, Caminho),
+	custoTotal(Caminho, CustoSemHeuristica),
+	bombaMaisPerto_aux(idastar, Ei, Bs, Cs).
 
 bombaMaisPerto(Algoritmo, Ei, Ef, Custo):-
 	todasBombas(Bombas),
@@ -222,7 +226,7 @@ entregaEncomendas_aux_2(Algoritmo, Ei, Encomendas, [Caminho2|R], Autonomia):-
 		(Algoritmo = df, df(Ei, Ef, _, Caminho2));
 		(Algoritmo = astar, astar(Ei, Ef, Caminho2,_));
 		(Algoritmo = bf, bf(Ei, Ef,_,Caminho2));
-		(Algoritmo = idastar, idastar(Ei, Ef, Custo, Caminho2))
+		(Algoritmo = idastar, idastar(Ei, Ef, _, Caminho2))
 	),
 	entregaEncomendas_aux_2(Algoritmo, Ef, Encomendas, R, AutonomiaInicial).
 
