@@ -117,10 +117,10 @@ update_next_bound(H) :-
 ordenaEncomendasDistanciaAux(_,[],_,[]).
 ordenaEncomendasDistanciaAux(Ei,[Vol-Enc1|Encs],Algoritmo,[Custo-Vol-Enc1|Res]) :-
   (
-  (Algoritmo = pp,pp(Ei,Enc1,Custo,Caminho));
-  (Algoritmo = astar,astar(Ei,Enc1,Caminho,Custo));
-  (Algoritmo = pl,pl(Ei,Enc1,Custo,Caminho));
-  (Algoritmo = idastar,idastar(Ei,Enc1,Custo,Caminho))
+    (Algoritmo = pp,pp(Ei,Enc1,Custo,Caminho));
+    (Algoritmo = astar,astar(Ei,Enc1,Caminho,Custo));
+    (Algoritmo = pl,pl(Ei,Enc1,Custo,Caminho));
+    (Algoritmo = idastar,idastar(Ei,Enc1,Custo,Caminho))
   ),
   ordenaEncomendasDistanciaAux(Ei,Encs,Algoritmo,Res).
 
@@ -146,8 +146,8 @@ todasEncomendas(Encs,Opcao,Algoritmo) :-
   findall(Volume-PontoGrafo,encomenda(_,Volume,_,PontoGrafo,_),Encomendas),
   pontoInicial(Ei),
   (
-  (Opcao = maxEntregas,sort(Encomendas,Sorted));
-  (Opcao = minDist,ordenaEncomendasDistancia(Ei,Encomendas,Algoritmo,Sorted))
+    (Opcao = maxEntregas,sort(Encomendas,Sorted));
+    (Opcao = minDist,ordenaEncomendasDistancia(Ei,Encomendas,Algoritmo,Sorted))
   ),
   camiao(_,_,CargaMaxima),
   encomendasCamiao(Sorted,Encs,0,CargaMaxima).
@@ -182,17 +182,17 @@ bombaMaisPerto(Algoritmo,Ei,Ef,Custo) :-
 minimo([X-Custo-C],X,C,Custo) :- !.
 minimo([X-A-C,Y-B-D|Res],N,E,Custo) :-
   (
-  (A > B,minimo([Y-B-D|Res],N,E,Custo));
-  minimo([X-A-C|Res],N,E,Custo)
+    (A > B,minimo([Y-B-D|Res],N,E,Custo));
+    minimo([X-A-C|Res],N,E,Custo)
   ).
 
 calculaCaminhoAux(_,_,[],[]).
 calculaCaminhoAux(Algoritmo,Ei,[E1|Es],[E1-Custo-Caminho|Rs]) :-
   (
-  (Algoritmo = pp,pp(Ei,E1,Custo,Caminho));
-  (Algoritmo = astar,astar(Ei,E1,Caminho,Custo));
-  (Algoritmo = pl,pl(Ei,E1,Custo,Caminho));
-  (Algoritmo = idastar,idastar(Ei,E1,Custo,Caminho))
+    (Algoritmo = pp,pp(Ei,E1,Custo,Caminho));
+    (Algoritmo = astar,astar(Ei,E1,Caminho,Custo));
+    (Algoritmo = pl,pl(Ei,E1,Custo,Caminho));
+    (Algoritmo = idastar,idastar(Ei,E1,Custo,Caminho))
   ),
   calculaCaminhoAux(Algoritmo,Ei,Es,Rs).
 
@@ -211,14 +211,14 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   camiao(_,AutonomiaInicial,_),
   bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
   (
-  (AutonomiaInicial > CustoBomba,AutonomiaInicial > CustoBomba,Ei \= Ef);
-  (write('Caminho impossivel'),nl,!,abort)
+    (AutonomiaInicial > CustoBomba,AutonomiaInicial > CustoBomba,Ei \= Ef);
+    (write('Caminho impossivel'),nl,!,abort)
   ),
   (
-  (Algoritmo = pp,pp(Ei,Ef,_,Caminho2));
-  (Algoritmo = pl,pl(Ei,Ef,_,Caminho2));
-  (Algoritmo = astar,astar(Ei,Ef,Caminho2,_));
-  (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho2))
+    (Algoritmo = pp,pp(Ei,Ef,_,Caminho2));
+    (Algoritmo = pl,pl(Ei,Ef,_,Caminho2));
+    (Algoritmo = astar,astar(Ei,Ef,Caminho2,_));
+    (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho2))
   ),
   calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial).
 
