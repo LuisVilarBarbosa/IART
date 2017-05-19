@@ -63,7 +63,7 @@ void generateTrucks(ofstream &out, const int numTrucks)
 {
 	for (int id = 1; id <= numTrucks; id++) {
 		int autonomy = (1 + rand() % 20) * 100;
-		int maxLoad = (3 + rand() % 20) * 1000;
+		int maxLoad = 200 + rand() % 300;
 		out << "camiao(" << id << ", " << autonomy << ", " << maxLoad << ").\n";
 	}
 }
@@ -126,8 +126,8 @@ void generateSupplyPoints(ofstream &out, const int maxNumSupplyPoints, const int
 void generateOrders(ofstream &out, const int numOrders, const int numPoints, const vector<string> clients)
 {
 	for (int id = 1; id <= numOrders; id++) {
-		int volume = rand();
-		int value = rand();
+		double volume = random(0, 50);
+		double value = random(1, 2500);
 		int deliveryPointId = 1 + rand() % numPoints;
 		string client = clients[rand() % clients.size()];
 		out << "encomenda(" << id << ", " << volume << ", " << value << ", " << deliveryPointId << ", '" << client << "').\n";
