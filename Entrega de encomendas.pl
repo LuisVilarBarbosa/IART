@@ -54,7 +54,8 @@ heuristica(IdPontoGrafo,Hseg) :-
   pontoGrafo(IdPontoGrafo,Long2,Lat2),
   Long is abs(Long2 - Long1),
   Lat is abs(Lat2 - Lat1),
-  Hseg is sqrt(Long * Long + Lat * Lat).
+  Hipotenusa is sqrt(Long * Long + Lat * Lat),
+  Hseg is 40000 * Hipotenusa / 360.
 
 astar(PontoInicial,PontoFinal,Caminho,Custo) :-
   heuristica(PontoInicial,Hi),
@@ -231,8 +232,14 @@ eliminaRepetidosSeguidos([P1,P2|Ps],[P1|Res]) :-
 eliminaRepetidosSeguidos([P1,P1|Ps],Res) :-
   eliminaRepetidosSeguidos([P1|Ps],Res).
 
+reset_timer :- statistics(walltime,_).
+print_time :-
+  statistics(walltime,[_,T]),
+  write('Time: '),write(T),write('ms'),nl.
+
 
 entregaEncomendas(Algoritmo,Opcao) :-
+  reset_timer,
   todasEncomendas(EncomendasTemp,Opcao,Algoritmo),
   sort(EncomendasTemp,Encomendas),
   write('Pontos de entrega: '),write(Encomendas),nl,
@@ -250,5 +257,6 @@ entregaEncomendas(Algoritmo,Opcao) :-
   append(CaminhoFinal,CaminhoFinalFlat),
   eliminaRepetidosSeguidos(CaminhoFinalFlat,CaminhoLimpo),
   custoTotal(CaminhoLimpo,CustoFinal),
+  print_time,
   write('Custo: '),write(CustoFinal),nl,
   write('Caminho: '),write(CaminhoFinal).
