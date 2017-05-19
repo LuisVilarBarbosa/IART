@@ -7,7 +7,7 @@
 \usepackage{indentfirst}
 \usepackage{graphicx}
 \usepackage{verbatim}
-
+\usepackage{listings}
 
 \begin{document}
 
@@ -35,11 +35,6 @@
 
 \newpage
 
-\section*{Objetivo}
-Este trabalho possui como principal objetivo a pesquisa sistemática, pouco ou nada informada, de soluções aplicada à entrega de encomendas. Neste caso em concreto, a solução que se pretende determinar consiste no melhor percurso a realizar para efetuar uma entrega de um determinado conjunto de encomendas. Para determinar o melhor percurso, são 
-
-\newpage
-
 \tableofcontents
 
 %************************************************************************************************
@@ -51,46 +46,308 @@ Este trabalho possui como principal objetivo a pesquisa sistemática, pouco ou n
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introdução}
+\section{Objetivo}
 
-Descrever os objetivos e motivação do trabalho. Descrever num parágrafo breve a estrutura do relatório.
+Este trabalho possui como principal objetivo a pesquisa sistemática, informada ou não informada, de soluções aplicada à entrega de encomendas. Para a pesquisa utilizando métodos fracos, iremos utilizar o algoritmo de pesquisa em profundidade e em largura e para a pesquisa com métodos informados, serão utilizados os algoritmos A* e IDA*. 
 
+Neste caso em concreto, a solução que se pretende determinar consiste no melhor percurso a realizar para efetuar uma entrega de um determinado conjunto de encomendas.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{O Jogo XXX}
+Este percurso deve procurar otimizar diferentes critérios, mediante a especificação do utilizador. Pode, por exemplo, procurar maximizar o número de entregas ou, por outro lado, minimizar o espaço percorrido, caso não pretenda que o transporte destas encomendas ocupe um dia completo.
 
-Descrever sucintamente o jogo, a sua história e, principalmente, as suas regras. Devem ser incluídas imagens apropriadas para explicar o funcionamento do jogo. (Pode ser idêntico ao texto do relatório intercalar.)
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Lógica do Jogo}
-
-Descrever o projeto e implementação da lógica do jogo em Prolog, incluindo a forma de representação do estado do tabuleiro e sua visualização, execução de movimentos, verificação do cumprimento das regras do jogo, determinação do final do jogo e cálculo das jogadas a realizar pelo computador utilizando diversos níveis de jogo. Sugere-se a estruturação desta secção da seguinte forma:
-
-\subsection{Representação do Estado do Jogo} Pode ser idêntico ao descrito no relatório intercalar.)
-
-\subsection{Visualização do Tabuleiro} (Pode ser idêntico ao descrito no relatório intercalar.)
-
-\subsection{Lista de Jogadas Válidas} Obtenção de uma lista de jogadas possíveis. Exemplo: \textit{valid\_moves(+Board, -ListOfMoves)}.
-
-\subsection{Execução de Jogadas} Validação e execução de uma jogada num tabuleiro, obtendo o novo estado do jogo. Exemplo: \textit{move(+Move, +Board, -NewBoard)}.
-
-\subsection{Avaliação do Tabuleiro} Avaliação do estado do jogo, que permitirá comparar a aplicação das diversas jogadas disponíveis. Exemplo: \textit{value(+Board, +Player, -Value)}.
-
-\subsection{Final do Jogo} Verificação do fim do jogo, com identificação do vencedor. Exemplo: \textit{game\_over(+Board, -Winner)}.
-
-\subsection{Jogada do Computador} Escolha da jogada a efetuar pelo computador, dependendo do nível de dificuldade. Por exemplo: \textit{choose\_move(+Level, +Board, -Move)}.
-
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Interface com o Utilizador}
+\section{Especificação}
 
-Descrever o módulo de interface com o utilizador em modo de texto.
+Tendo em conta que o tema escolhido se trata de um problema de pesquisa, é necessário representar os estados, a função de transição e a heurística.
 
+Para a distribuição de encomendas, numa certa região, são necessários vários camiões. No entanto, neste caso, uma vez que a empresa têxtil em questão possui dois camiões, mas um dos motoristas não compareceu ao trabalho por motivo de doença, apenas se considera que um camião fará a entrega. Os camiões possuem um identificador, uma determinada autonomia fixa (combustível) e uma capacidade máxima de carga (volume). São representados pelo seguinte predicado:
+
+\centerline{\textbf{camiao(Id, Autonomia, CargaMaxima).}}
+
+Num dia de trabalho, o motorista de um camião percorre, em média, 500 quilómetros. É importante ter em conta que um camião nunca deve ficar sem combustível, podendo efetuar um abastecimento em certos pontos do mapa. 
+
+Para representar os pontos de um mapa, que irão corresponder aos locais onde serão feitas as entregas ou onde se localizam os postos de abastecimento, implementou-se o seguinte predicado:
+
+\centerline{\textbf{pontoGrafo(Id, Long, Lat).}}
+
+Para se saber quais os pontos onde se começa e acaba a viagem e os pontos onde se pode efetuar o abastecimento, criaram-se os seguintes predicados:
+
+\centerline{\textbf{pontoInicial(Id).}}
+
+\centerline{\textbf{pontoFinal(Id).}}
+
+\centerline{\textbf{pontoAbastecimento(Id).}}
+
+Em todos os casos, “Id” corresponde ao “Id” de um PontoGrafo.
+
+As encomendas que serão distribuídas são definidas pelo seguinte predicado:
+
+\centerline{\textbf{encomenda(Id, Volume, Valor, IdPontoEntrega, Cliente).}}
+
+Desta forma, cada estado do problema de pesquisa irá ser representado por um PontoGrafo.
+
+A função de transição que consideramos adequada corresponde a um facto que se refere a uma aresta do grafo. Esta aresta será representada por um facto com a seguinte definição:
+
+\centerline{\textbf{sucessor(IdPontoGrafo, IdSucessor, Custo).}}
+
+Para a resolução do problema, serão aplicados alguns algoritmos de pesquisa (pesquisa em profundidade e largura, A* e IDA*), sendo testada a eficácia destes através da medição do tempo de execução que cada um leva a chegar a uma solução (ótima ou não, dependendo do algoritmo) para o problema.
+
+Começando pelos métodos fracos, sabe-se que estes utilizam técnicas genéricas de pesquisa, sendo independentes do problema, podendo levar a uma explosão combinatória do número de estados a pesquisar.
+
+O primeiro algoritmo implementado foi o \textbf{"Pesquisa em profundidade"} (DFS), uma vez que é considerado o método de pesquisa mais simples. Este, começando num estado inicial, verifica se é solução. Se for, termina, senão, efetua \textit{backtrack}. Se o nó não possuir sucessores, faz-se \textit{backtrack}. De seguida, escolhe-se um filho do nó ainda não visitado, repetindo-se o algoritmo a partir desse filho. Se existirem nós por visitar, volta-se a escolher um que ainda não tenha sido visitado, senão faz-se \textit{backtrack}.
+
+\begin{lstlisting}[language=Prolog,xleftmargin=.15\textwidth]
+pp(Ei,Ef,Custo,Caminho) :-
+  pp(Ei,Ef,[Ei],L,Custo),
+  reverse(L,Caminho).
+
+pp(Ef,Ef,L,L,0).
+pp(Ea,Ef,Lant,L,Custo) :-
+  sucessor(Ea,Eseg,C),
+  \+ member(Eseg,Lant),
+  pp(Eseg,Ef,[Eseg|Lant],L,Custo2),
+  Custo is Custo2 + C.
+\end{lstlisting}
+
+Seja:
+
+r - fator de ramificação média;
+
+p - profundidade máxima;
+
+O algoritmo, para cada rama, terá de o percorrer até à sua profundidade máxima (p), ou seja, terá complexidade temporal O(r \^ p).
+
+Por outro lado, apenas necessita de armazenar o estado dos filhos dos nós que fazem parte da solução atual, ou seja, a sua complexidade espacial será apenas O(r x p).
+
+Não é considerado um algoritmo completo, uma vez que poderia nunca chegar a encontrar uma solução caso o caminho fosse infinitamente grande.
+
+Também não é ótimo, visto que a primeira solução que encontra pode não ser a que necessita de menos passos.
+
+De seguida, e ainda nos métodos fracos, decidimos implementar a \textbf{"Pesquisa em largura"}. Neste algoritmo, é dada prioridade aos nós mais próximos da raiz. O algoritmo, começando na raiz e com uma fila vazia, verifica se o nó inicial é solução. Se for, termina o algoritmo, tendo uma solução garantidamente ótima. Se o nó possuir sucessores, estes são adicionados ao fim da fila. Retira-se o nó que estiver no topo da fila e repete-se o algoritmo para esse nó.
+
+\begin{lstlisting}[language=Prolog,xleftmargin=.1\textwidth]
+custoTotal([_],0).
+custoTotal([P1,P2],Custo) :-
+  sucessor(P1,P2,Custo).
+custoTotal([P1,P2|Ps],CustoTotal) :-
+  sucessor(P1,P2,Custo),
+  custoTotal([P2|Ps],CustoTotal2),
+  CustoTotal is Custo + CustoTotal2.
+
+pl(Ei,Ef,Custo,Caminho) :-
+  pl([[Ei]],Ef,L),
+  reverse(L,Caminho),
+  custoTotal(Caminho,Custo).
+
+pl([La|_],Ef,La) :- La=[Ef|_].
+pl([La|OLs],Ef,L) :-
+  La=[Ea|OEs],
+  findall([Eseg|La],(sucessor(Ea,Eseg,_),
+  \+ member(Eseg,OEs)),Lseg),
+  append(OLs,Lseg,NL),
+  pl(NL,Ef,L).
+\end{lstlisting}
+
+Este algoritmo apenas visita a árvore até à profundidade da solução, fazendo com que a complexidade temporal seja O(r\^p), assim como a complexidade espacial, uma vez que a fila vai ter de armazenar todos os nós do nível da solução.
+
+Se todas as arestas possuíssem o mesmo custo, o algoritmo seria considerado ótimo, pois a primeira solução encontrada seria necessariamente a melhor, apesar de não ser o caso. No entanto, considera-se que é um algoritmo completo, uma vez que r é finito.
+
+Comparando estes dois algoritmos, verifica-se que o \textbf{"Primeiro em profundidade"} utiliza menos memória que o \textbf{"Primeiro em largura"}.
+
+Uma vez que os métodos fracos não possuem informação sobre o problema, decidimos implementar dois métodos informados, pois estes possuem alguma, nomeadamente algum tipo de função heurística que permita dar um valor a um determinado estado. Com este valor, é possível escolher aquela que se acredita ser a melhor opção, ignorando as outras.
+
+Uma vez que uma função heurística não deve ser uma função qualquer, tentamos que a escolhida tivesse as seguintes propriedades:
+
+- Mais simples que o cálculo do valor real do estado, sendo, no entanto, o mais próxima do valor real possível (pois desta forma, mais depressa o método converge para a solução);
+
+- Ser otimista. Como no nosso caso, pretendemos minimizar o custo, a função heurística tem que ser menor ou igual ao custo real;
+
+- Ser consistente (monótona).
+
+Uma vez que o nosso problema se trata de distâncias físicas entre pontos, consideramos que a função heurística mais adequada seria a distância em linha reta entre os 2 pontos. Esta heurística é claramente otimista, uma vez que não é possível a distância real ser menor que a nossa função.
+
+\begin{lstlisting}[language=Prolog,xleftmargin=.1\textwidth]
+heuristica(IdPontoGrafo,Hseg) :-
+  pontoFinal(IdPontoFinal),
+  pontoGrafo(IdPontoFinal,Long1,Lat1),
+  pontoGrafo(IdPontoGrafo,Long2,Lat2),
+  Long is abs(Long2 - Long1),
+  Lat is abs(Lat2 - Lat1),
+  Hseg is sqrt(Long * Long + Lat * Lat).
+\end{lstlisting}
+
+Após estar definida a heurística, implementamos o algoritmo \textbf{A*}. Este considera que o valor de cada sucessor é dado pela seguinte função:
+
+\centerline{\textbf{f*(n) = g(n) + h*(n).}}
+
+Esta função resulta de uma combinação dos algoritmos gananciosos (h*(n) corresponde à estimativa do custo do passo desde o nó corrente até à solução), que realizam estimativas do futuro, e do algorimo do custo uniforme, que utiliza os custos até ao presente (g(n)).
+
+Este algoritmo recorre a duas listas:
+
+- Lista aberta: Nós a expandir, ordenados por f*(n).
+
+- Lista fechada: Nós já expandidos.
+
+Inicialmente, a lista aberta contém apenas o estado inicial, e a lista fechada está vazia. Caso a lista aberta esteja vazia, o algoritmo termina. Retira-se o primeiro estado da lista aberta e adiciona-se este à lista fechada. Se o estado for o estado final, o algoritmo retorna. Caso contrário, para cada sucessor que não esteja na lista fechada, calcula-se o seu possível novo valor estimado e se o sucessor não estiver na lista aberta ou o novo valor for melhor que o valor anterior, o sucessor é adicionado à lista aberta. Repete-se o algoritmo até este terminar.
+
+\begin{lstlisting}[language=Prolog]
+astar(PontoInicial,PontoFinal,Caminho,Custo) :-
+  heuristica(PontoInicial,Hi),
+  astar(PontoInicial, PontoFinal,[Hi-[PontoInicial]-0],L,Custo),
+  reverse(L,Caminho).
+
+astar(_PontoInicial,E,[C-[E|Cam]-_|_],[E|Cam],C) :- !.
+astar(PontoInicial,PontoFinal,[_-[E|Cam]-G|R],S,C) :-
+  findall(F2-[E2|[E|Cam]]-G2,
+  (sucessor(E,E2,C),G2 is G + C,heuristica(E2,H2),F2 is G2 + H2),
+  Lsuc),
+  append(R,Lsuc,L),
+  sort(L,Lord),
+  astar(PontoInicial,PontoFinal,Lord,S,C).
+\end{lstlisting}
+
+Apesar da complexidade do algoritmo A* depender muito da função heurística escolhida, pode-se afirmar que em todos os casos este algoritmo é bastante dispendioso na memória, uma vez que tem que armazenar a informação de todos os estados até chegar ao estado final, e também gasta bastante tempo.
+
+Por não se aplicar a problemas de larga escala, achamos importante implementar o algoritmo \textbf{IDA*} com aprofundamento iterativo para reduzir a memória necessária, utilizando-se o valor da função heurística em vez da profundidade para parar e recomeçar o algoritmo.
+
+\begin{lstlisting}[language=Prolog,xleftmargin=.2\textwidth]
+idastar(Ei,Ef,Custo,Caminho) :-
+  retract(next_bound(_)),
+  fail
+  ;
+  asserta(next_bound(0)),
+  idastarAux(Ei,Ef,L),
+  reverse(L,Caminho),
+  custoTotal(Caminho,Custo).
+
+idastarAux(Ei,Ef,L) :-
+  retract(next_bound(Bound)),
+  asserta(next_bound(100000)),
+  heuristica(Ei,Hi),
+  pp1([Ei],Ef,Hi,Bound,L)
+  ;
+  next_bound(NextBound),
+  NextBound < 100000,
+  idastarAux(Ei,Ef,L).
+
+pp1([E|OEs],E,H,Bound,[E|OEs]) :- H =< Bound.
+pp1([E|OEs],Ef,H,Bound,Sol) :-
+  H =< Bound,
+  sucessor(E,Esuc,_),
+  \+ member(Esuc,OEs),
+  heuristica(Esuc,Hsuc),
+  pp1([Esuc,E|OEs],Ef,Hsuc,Bound,Sol).
+pp1(_,_,H,Bound,_) :-
+  H > Bound,
+  update_next_bound(H),
+  fail.
+
+update_next_bound(H) :-
+  next_bound(Bound),
+  Bound =< H, !
+  ;
+  retract(next_bound(Bound)), !,
+  asserta(next_bound(H)).
+\end{lstlisting}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Desenvolvimento}
+
+\subsection{Ferramentas/APIs utilizadas} 
+
+Para o desenvolvimento de uma solução para o problema apresentado, o grupo decidiu que seria uma boa ideia tirar partido das funcionalidades da linguagem \textbf{Prolog} para implementar tanto os algoritmos como os predicados que solucionam o enunciado em questão. Este código foi desenvolvido em \textbf{Notepad++}, fazendo uso de um ficheiro que continha a linguagem Prolog para o IDE em questão, de forma a fornecer uma melhor identação do código. Para compilar e correr o programa, utilizou-se \textbf{SICStus Prolog VC14 4.3.3}.
+
+Além da solução em si, e de forma a facilitar o teste desta, o grupo implementou um programa gerador de dados que construísse vários factos com informações pertinentes para o problema. Este programa foi implementado em \textbf{C++}, fazendo-se uso do \textbf{Visual Studio 2017}.
+
+Todo o ambiente de desenvolvimento deu-se em \textbf{Windows 10}.
+
+\subsection{Estrutura da aplicação} 
+
+A aplicação referente à solução do problema foi implementada num único ficheiro \textbf{Prolog}, denominado \textbf{Entrega de encomendas.pl}. Inicialmente, é carregado um ficheiro de dados denominado \textbf{data}, que é criado quando executamos o programa de geração de dados. De seguida, encontram-se implementados os quatro algoritmos referidos anteriormente, que são utilizados pelos predicados que resolvem o problema, estando estes implementados a seguir aos algoritmos.
+
+Uma vez que se trata de uma implementação em \textbf{Prolog}, consideramos que não faz sentido uma descrição por módulos ou mesmo a demonstração de diagrama de classes.
+
+No entando, o programa de geração de dados, encontra-se dividido em dois ficheiros: DataGenerator.cpp e Node.cpp (com o respetivo .h associado).
+
+ACRESCENTAR MAIS INFORMAÇÃO E TALVEZ DIAGRAMA DE CLASSES ?
+
+\subsection{Detalhes relevantes da implementação} 
+
+Passando para a descrição da implementação da solução, esta é realizada através da chamada ao seguinte predicado principal:
+
+\centerline{\textbf{entregaEncomendas(Algoritmo,Opcao).}}
+
+Em Algoritmo, pode-se colocar as seguintes opções: \textbf{pp, pl, astar} ou \textbf{idastar}. Em Opcao, pode-se colocar \textbf{maxEntregas} caso se pretenda determinar o percurso de forma a maximizar o número de entregas, ou \textbf{minDist} caso se queira minimizar o espaço percorrido pelo camião.
+
+Inicialmente, é chamado o seguinte predicado:
+
+\centerline{\textbf{todasEncomendas(EncomendasTemp,Opcao,Algoritmo)}}
+
+ao qual se passam os dados anteriores e onde se obtém, em EncomendasTemp, todas as encomendas que um camião poderá vir a suportar, dada a sua capacidade máxima. Neste predicado, começa-se por obter todas as encomendas que estão na nossa base de factos, sendo colocadas numa lista no formato Volume-PontoGrafo. Caso a opção escolhida seja maximizar as entregas, a lista é ordenada da encomenda que possui menor volume para a maior, garantindo-se assim que no camião se colocam o máximo de encomendas possíveis. Caso a opção seja minimizar a distância, chama-se um predicado com o seguinte formato: \textbf{ordenaEncomendasDistancia(Ei,Encomendas,Algoritmo,Sorted).} Neste predicado, passa-se o ponto inicial do nosso grafo, todas as encomendas que foram calculadas inicialmente e o algoritmo em questão. Mediante o algoritmo, é colocado em Sorted no formato Volume-PontoGrafo a encomenda mais próxima do ponto inicial e, de seguida, o predicado é chamado recursivamente para calcular qual é a próxima encomenda mais próxima da anterior, e assim sucessivamente, até a lista que continha todas as encomendas se encontrar vazia. Desta forma, garante-se a escolha de um caminho mais curto.
+
+Por fim, utiliza-se o predicado
+
+\centerline{\textbf{encomendasCamiao(Sorted,Encs,0,CargaMaxima).}}
+
+para garantir que a soma de todas as encomendas escolhidas é igual ou inferior à capacidade máxima do camião.
+
+De seguida, obtêm-se os pontos inicial e final, bem como a autonomia, sendo passados para um novo predicado, bem como a lista de encomendas obtida anteriormente:
+
+\centerline{\textbf{calculaCaminho(Algoritmo,Ei,Encomendas,C,Autonomia).}}
+
+Este predicado começa por chamar um predicado auxiliar
+
+\centerline{\textbf{calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado).}}
+
+que faz o cálculo de todos os custos e caminhos para as encomendas possíveis, dado um ponto inicial, colocando numa lista no formato Encomenda-Custo-Caminho. Este cálculo varia mediante o valor passado em Algoritmo. 
+
+Com esta lista, chama-se o predicado
+
+\centerline{\textbf{minimo(Resultado,Min,C,Custo).}}
+
+que vai buscar qual é o caminho para a encomenda que possui menor custo, desde o ponto inicial. De seguida, é apagada a encomenda para o qual foi encontrado o melhor caminho, sendo o predicado \textbf{calculaCaminho} chamado novamente, mas agora o ponto inicial corresponde à encomenda que foi escolhida anteriormente, sendo todo este processo repetido para encontrar o melhor caminho desde essa encomenda até a uma nova futura encomenda.
+
+É importante realçar que antes da chamada recursiva é efetuada a verificação se o camião possui autonomia suficiente para se deslocar desde o ponto onde se encontra até ao ponto seguinte. Se for possível, essa distância é deduzida na sua autonomia. Caso não seja possível, chama-se o seguinte predicado:
+
+\centerline{\textbf{bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba).}}
+
+Este vai colocar em Ef qual é a bomba mais próxima do ponto em que o camião se encontra (Ei), verificando se o camião possui autonomia para se deslocar até a essa mesma bomba, cuja distância equivale a CustoBomba. 
+
+Terminado o cálculo do caminho desde o ponto inicial até à última encomenda, falta ainda o camião deslocar-se desde a última encomenda até ao ponto final. Desta forma, vai-se buscar qual foi a última entrega e adiciona-se à lista de encomendas o valor do ponto final, chamando novamente o predicado calculaCaminho, agora com ponto inicial correspondente à última entrega, e ponto final correspondente.
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experiências}
+
+Objectivo de cada experiência
+Resultados
+
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusões}
-Que conclui deste projecto? Como poderia melhorar o trabalho desenvolvido?
+
+Análise dos resultados das experiências levadas a cabo
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Melhoramentos}
+
+Sugestões para trabalho futuro
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Recursos}
+
+Bibliografia
+Software
+Elementos do grupo: indicar percentagem aproximada de trabalho efectivo de cada elemento do grupo
 
 
 \clearpage

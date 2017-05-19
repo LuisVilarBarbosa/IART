@@ -212,7 +212,7 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   camiao(_,AutonomiaInicial,_),
   bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
   (
-    (AutonomiaInicial > CustoBomba,AutonomiaInicial > CustoBomba,Ei \= Ef);
+    (AutonomiaInicial > CustoBomba,Ei \= Ef);
     (write('Caminho impossivel'),nl,!,abort)
   ),
   (
