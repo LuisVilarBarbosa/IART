@@ -38,7 +38,7 @@ int showAndGetNumber(string to_show, const int maxValue)
 			value = -1;
 		}
 		if (value < 0)
-			cout << "Invalid value. It must be positive or zero.";
+			cout << "Invalid value. It must be positive or zero.\n";
 		if (value > maxValue)
 			cout << "Value too large.\n";
 	} while (value < 0);
@@ -161,7 +161,7 @@ void generateSuccessors(ofstream &out, const int maxNumSuccessorsPerPoint, const
 		int myMaxNumSuccessors = 1 + rand() % myMaxNumSuccessorsPerPoint;
 		set<int> mySuccessorsSet;
 		for (int i = 0; i < myMaxNumSuccessors; i++) {
-			int successorId = 1 + (graphPointId - 1 + rand() % 5) % numPoints;
+			size_t successorId = 1 + (graphPointId - 1 + rand() % 5) % numPoints;
 			if (successorId != graphPointId)
 				mySuccessorsSet.insert(successorId);
 		}
