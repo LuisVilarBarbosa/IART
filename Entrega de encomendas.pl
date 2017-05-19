@@ -10,7 +10,7 @@ sucessor(IdPontoGrafo, IdSucessor, Custo).
 
 :- use_module(library(lists)).
 
-:- load_files(data).
+:- load_files(dados1).
 
 /* Pesquisa em profundidade */
 pp(Ei,Ef,Custo,Caminho) :-
