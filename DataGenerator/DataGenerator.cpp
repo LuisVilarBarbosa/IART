@@ -67,12 +67,12 @@ void generateTrucks(ofstream &out, const int numTrucks)
 	}
 }
 
-vector<Node> generateGraphPoints(ofstream &out, const int maxNumPoints)
+vector<Node> generateGraphPoints(ofstream &out, const int maxNumPoints, const int maxDegree)
 {
 	set<Node> graphPointsSet;
 	for (int id = 1; id <= maxNumPoints; id++) {
-		int longitude = rand() % 50;
-		int latitude = rand() % 50;
+		int longitude = rand() % maxDegree;
+		int latitude = rand() % maxDegree;
 		graphPointsSet.insert(Node(longitude, latitude));
 	}
 	vector<Node> graphPoints;
@@ -128,11 +128,17 @@ void generateOrders(ofstream &out, const int numOrders, const int numPoints, con
 	}
 }
 
+double degreesToKm(const double degrees)
+{
+	return 40000 * degrees / 360;
+}
+
 double calculate_cost(const Node n1, const Node n2)
 {
 	int diffLongitude = abs(n1.getLongitude() - n2.getLongitude());
 	int diffLatitude = abs(n1.getLatitude() - n2.getLatitude());
-	return sqrt(diffLatitude * diffLongitude + diffLatitude * diffLatitude); // For better measurement, it should calculate arc instead of the line.
+	double hypotenuse = sqrt(diffLongitude * diffLongitude + diffLatitude * diffLatitude); // For better measurement, it should calculate arc instead of the line.
+	return degreesToKm(hypotenuse);
 }
 
 // It is assumed that 'graphPoints' is ordered.
@@ -203,7 +209,8 @@ int main()
 	generateTrucks(out, numTrucks);
 	out << "\n";
 	int maxNumPoints = showAndGetNumber("Maximum number of graph points: ", INT_MAX);
-	vector<Node> graphPoints = generateGraphPoints(out, maxNumPoints);
+	int maxDegree = showAndGetNumber("Maximum longitude and latitude degree: ", 360);
+	vector<Node> graphPoints = generateGraphPoints(out, maxNumPoints, maxDegree);
 	out << "\n";
 	int numPoints = graphPoints.size();
 	int initialPoint = showAndGetNumber("Inicial point (0 = random): ", numPoints);
