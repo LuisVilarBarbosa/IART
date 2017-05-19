@@ -1,15 +1,15 @@
 #include "Node.h"
 
-Node::Node(int longitude, int latitude) {
+Node::Node(double longitude, double latitude) {
 	this->longitude = longitude;
 	this->latitude = latitude;
 }
 
-int Node::getLongitude() const {
+double Node::getLongitude() const {
 	return longitude;
 }
 
-int Node::getLatitude() const {
+double Node::getLatitude() const {
 	return latitude;
 }
 

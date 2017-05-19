@@ -3,12 +3,12 @@
 
 class Node {
 private:
-	int longitude;
-	int latitude;
+	double longitude;
+	double latitude;
 public:
-	Node(int longitude, int latitude);
-	int getLongitude() const;
-	int getLatitude() const;
+	Node(double longitude, double latitude);
+	double getLongitude() const;
+	double getLatitude() const;
 	bool operator<(const Node node) const;
 };
 

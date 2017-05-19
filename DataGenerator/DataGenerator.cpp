@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <climits>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -67,12 +68,17 @@ void generateTrucks(ofstream &out, const int numTrucks)
 	}
 }
 
+double random(double min, double max)
+{
+	return (double)rand() / (RAND_MAX + 1)*(max - min) + min;
+}
+
 vector<Node> generateGraphPoints(ofstream &out, const int maxNumPoints, const int maxDegree)
 {
 	set<Node> graphPointsSet;
 	for (int id = 1; id <= maxNumPoints; id++) {
-		int longitude = rand() % maxDegree;
-		int latitude = rand() % maxDegree;
+		double longitude = random(0, maxDegree);
+		double latitude = random(0, maxDegree);
 		graphPointsSet.insert(Node(longitude, latitude));
 	}
 	vector<Node> graphPoints;
@@ -135,8 +141,8 @@ double degreesToKm(const double degrees)
 
 double calculate_cost(const Node n1, const Node n2)
 {
-	int diffLongitude = abs(n1.getLongitude() - n2.getLongitude());
-	int diffLatitude = abs(n1.getLatitude() - n2.getLatitude());
+	double diffLongitude = abs(n1.getLongitude() - n2.getLongitude());
+	double diffLatitude = abs(n1.getLatitude() - n2.getLatitude());
 	double hypotenuse = sqrt(diffLongitude * diffLongitude + diffLatitude * diffLatitude); // For better measurement, it should calculate arc instead of the line.
 	return degreesToKm(hypotenuse);
 }
@@ -180,6 +186,7 @@ void error()
 
 int main()
 {
+	srand((unsigned)time(NULL));
 	string clientsFilename, outputFilename;
 
 	cout << "Clients filename: ";
