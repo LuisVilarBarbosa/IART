@@ -8,9 +8,9 @@ encomenda(Id, Volume, Valor, IdPontoEntrega, Cliente).
 sucessor(IdPontoGrafo, IdSucessor, Custo).
 */
 
-:- load_files(data).
-
 :- use_module(library(lists)).
+
+:- load_files(data).
 
 /* Pesquisa em profundidade */
 pp(Ei,Ef,Custo,Caminho) :-
@@ -114,16 +114,6 @@ update_next_bound(H) :-
 
 
 /* Entrega de encomendas */
-encomendasCamiao([],[],_,_).
-encomendasCamiao([Vol-_|Res],Lista,CargaTotal,CargaMaxima) :-
-  CargaTotal2 is CargaTotal + Vol,
-  CargaTotal2 > CargaMaxima,
-  encomendasCamiao(Res,Lista,CargaTotal,CargaMaxima).
-encomendasCamiao([Vol-IdP|Res],[IdP|OPs],CargaTotal, CargaMaxima) :-
-  CargaTotal2 is CargaTotal + Vol,
-  CargaTotal2 =< CargaMaxima,
-  encomendasCamiao(Res,OPs,CargaTotal2,CargaMaxima).
-
 ordenaEncomendasDistanciaAux(_,[],_,[]).
 ordenaEncomendasDistanciaAux(Ei,[Vol-Enc1|Encs],Algoritmo,[Custo-Vol-Enc1|Res]) :-
   (
@@ -141,6 +131,16 @@ ordenaEncomendasDistancia(Ei,Encomendas,Algoritmo,[V-Ponto|Res]) :-
   nth0(0,OrdMaisProximas,_-V-Ponto),
   delete(Encomendas,_-Ponto,Restantes),
   ordenaEncomendasDistancia(Ponto,Restantes,Algoritmo,Res).
+
+encomendasCamiao([],[],_,_).
+encomendasCamiao([Vol-_|Res],Lista,CargaTotal,CargaMaxima) :-
+  CargaTotal2 is CargaTotal + Vol,
+  CargaTotal2 > CargaMaxima,
+  encomendasCamiao(Res,Lista,CargaTotal,CargaMaxima).
+encomendasCamiao([Vol-IdP|Res],[IdP|OPs],CargaTotal, CargaMaxima) :-
+  CargaTotal2 is CargaTotal + Vol,
+  CargaTotal2 =< CargaMaxima,
+  encomendasCamiao(Res,OPs,CargaTotal2,CargaMaxima).
 
 todasEncomendas(Encs,Opcao,Algoritmo) :-
   findall(Volume-PontoGrafo,encomenda(_,Volume,_,PontoGrafo,_),Encomendas),
