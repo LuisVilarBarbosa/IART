@@ -134,14 +134,16 @@ ordenaEncomendasDistancia(Ei,Encomendas,Algoritmo,[V-Ponto|Res]) :-
   ordenaEncomendasDistancia(Ponto,Restantes,Algoritmo,Res).
 
 encomendasCamiao([],[],_,_).
-encomendasCamiao([Vol-_|Res],Lista,CargaTotal,CargaMaxima) :-
+encomendasCamiao([Vol-IdP|Res],[IdP|OPs],CargaTotal,CargaMaxima) :-
   CargaTotal2 is CargaTotal + Vol,
-  CargaTotal2 > CargaMaxima,
-  encomendasCamiao(Res,Lista,CargaTotal,CargaMaxima).
-encomendasCamiao([Vol-IdP|Res],[IdP|OPs],CargaTotal, CargaMaxima) :-
-  CargaTotal2 is CargaTotal + Vol,
-  CargaTotal2 =< CargaMaxima,
-  encomendasCamiao(Res,OPs,CargaTotal2,CargaMaxima).
+  (
+    CargaTotal2 =< CargaMaxima,
+    encomendasCamiao(Res,OPs,CargaTotal2,CargaMaxima)
+  );
+  (
+    CargaTotal2 > CargaMaxima,
+    encomendasCamiao(Res,[IdP|OPs],CargaTotal,CargaMaxima)
+  ).
 
 todasEncomendas(Encs,Opcao,Algoritmo) :-
   findall(Volume-PontoGrafo,encomenda(_,Volume,_,PontoGrafo,_),Encomendas),
