@@ -198,13 +198,6 @@ calculaCaminhoAux(Algoritmo,Ei,[E1|Es],[E1-Custo-Caminho|Rs]) :-
   calculaCaminhoAux(Algoritmo,Ei,Es,Rs).
 
 calculaCaminho(_,_,[],[],_).
-calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
-  calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
-  minimo(Resultado,Min,C,Custo),
-  Custo =< Autonomia,
-  Autonomia2 is Autonomia - Custo,
-  delete(Encomendas,Min,Resto),
-  calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2).
 calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
   minimo(Resultado,_,_,Custo),
@@ -213,7 +206,7 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
   (
     (AutonomiaInicial > CustoBomba,Ei \= Ef);
-    (write('Caminho impossivel'),nl,!,abort)
+    (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,fail)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
   ),
   (
     (Algoritmo = pp,pp(Ei,Ef,_,Caminho2));
@@ -222,6 +215,13 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
     (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho2))
   ),
   calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial).
+calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
+  calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
+  minimo(Resultado,Min,C,Custo),
+  Custo =< Autonomia,
+  Autonomia2 is Autonomia - Custo,
+  delete(Encomendas,Min,Resto),
+  calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2).
 
 
 eliminaRepetidosSeguidos([P1,P2],[P1,P2]) :- P1 \= P2.
@@ -240,8 +240,7 @@ print_time :-
 
 entregaEncomendas(Algoritmo,Opcao) :-
   reset_timer,
-  todasEncomendas(EncomendasTemp,Opcao,Algoritmo),
-  sort(EncomendasTemp,Encomendas),
+  todasEncomendas(Encomendas,Opcao,Algoritmo),
   write('Pontos de entrega: '),write(Encomendas),nl,
   camiao(_,Autonomia,_),
   pontoInicial(Ei),
@@ -257,6 +256,10 @@ entregaEncomendas(Algoritmo,Opcao) :-
   append(CaminhoFinal,CaminhoFinalFlat),
   eliminaRepetidosSeguidos(CaminhoFinalFlat,CaminhoLimpo),
   custoTotal(CaminhoLimpo,CustoFinal),
+/*
+  CustoFinal >= 300,
+  CustoFinal =< 700,
+*/
   print_time,
   write('Custo: '),write(CustoFinal),nl,
   write('Caminho: '),write(CaminhoFinal).
