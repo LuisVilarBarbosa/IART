@@ -65,8 +65,8 @@ astar(PontoInicial,PontoFinal,Caminho,Custo) :-
 astar(_PontoInicial,E,[C-[E|Cam]-_|_],[E|Cam],C) :- !.
 astar(PontoInicial,PontoFinal,[_-[E|Cam]-G|R],S,C) :-
   findall(F2-[E2|[E|Cam]]-G2,
-  (sucessor(E,E2,C),G2 is G + C,heuristica(E2,H2),F2 is G2 + H2),
-  Lsuc),
+    (sucessor(E,E2,C),G2 is G + C,heuristica(E2,H2),F2 is G2 + H2),
+    Lsuc),
   append(R,Lsuc,L),
   sort(L,Lord),
   astar(PontoInicial,PontoFinal,Lord,S,C).
