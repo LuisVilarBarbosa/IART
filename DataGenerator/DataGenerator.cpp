@@ -41,8 +41,8 @@ int showAndGetNumber(string to_show, const int maxValue)
 			cout << "Invalid value. It must be positive or zero.\n";
 		if (value > maxValue)
 			cout << "Value too large.\n";
-	} while (value < 0);
-	return (int)value;
+	} while (value < 0 || value > maxValue);
+	return value;
 }
 
 vector<string> loadClientsFile(const string filename)
