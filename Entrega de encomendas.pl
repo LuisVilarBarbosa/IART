@@ -202,26 +202,28 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho|R],Autonomia) :-
   calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
   minimo(Resultado,Min,Caminho,Custo),
   (
-    Custo =< Autonomia,
-    Autonomia2 is Autonomia - Custo,
-    delete(Encomendas,Min,Resto),
-    calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2)
-  );
-  (
-    Custo > Autonomia,
-    camiao(_,AutonomiaInicial,_),
-    bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
     (
-      (AutonomiaInicial > CustoBomba,Ei \= Ef);
-      (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,fail)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
-    ),
+      Custo =< Autonomia,
+      Autonomia2 is Autonomia - Custo,
+      delete(Encomendas,Min,Resto),
+      calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2)
+    );
     (
-      (Algoritmo = pp,pp(Ei,Ef,_,Caminho));
-      (Algoritmo = pl,pl(Ei,Ef,_,Caminho));
-      (Algoritmo = astar,astar(Ei,Ef,Caminho,_));
-      (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho))
-    ),
-    calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial)
+      Custo > Autonomia,
+      camiao(_,AutonomiaInicial,_),
+      bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
+      (
+        (AutonomiaInicial > CustoBomba,Ei \= Ef);
+        (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,abort)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
+      ),
+      (
+        (Algoritmo = pp,pp(Ei,Ef,_,Caminho));
+        (Algoritmo = pl,pl(Ei,Ef,_,Caminho));
+        (Algoritmo = astar,astar(Ei,Ef,Caminho,_));
+        (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho))
+      ),
+      calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial)
+    )
   ).
 
 
