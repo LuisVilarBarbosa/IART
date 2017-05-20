@@ -198,30 +198,31 @@ calculaCaminhoAux(Algoritmo,Ei,[E1|Es],[E1-Custo-Caminho|Rs]) :-
   calculaCaminhoAux(Algoritmo,Ei,Es,Rs).
 
 calculaCaminho(_,_,[],[],_).
-calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
+calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho|R],Autonomia) :-
   calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
-  minimo(Resultado,_,_,Custo),
-  Custo > Autonomia,
-  camiao(_,AutonomiaInicial,_),
-  bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
+  minimo(Resultado,Min,Caminho,Custo),
   (
-    (AutonomiaInicial > CustoBomba,Ei \= Ef);
-    (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,fail)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
-  ),
+    Custo =< Autonomia,
+    Autonomia2 is Autonomia - Custo,
+    delete(Encomendas,Min,Resto),
+    calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2)
+  );
   (
-    (Algoritmo = pp,pp(Ei,Ef,_,Caminho2));
-    (Algoritmo = pl,pl(Ei,Ef,_,Caminho2));
-    (Algoritmo = astar,astar(Ei,Ef,Caminho2,_));
-    (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho2))
-  ),
-  calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial).
-calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
-  calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
-  minimo(Resultado,Min,C,Custo),
-  Custo =< Autonomia,
-  Autonomia2 is Autonomia - Custo,
-  delete(Encomendas,Min,Resto),
-  calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2).
+    Custo > Autonomia,
+    camiao(_,AutonomiaInicial,_),
+    bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
+    (
+      (AutonomiaInicial > CustoBomba,Ei \= Ef);
+      (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,fail)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
+    ),
+    (
+      (Algoritmo = pp,pp(Ei,Ef,_,Caminho));
+      (Algoritmo = pl,pl(Ei,Ef,_,Caminho));
+      (Algoritmo = astar,astar(Ei,Ef,Caminho,_));
+      (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho))
+    ),
+    calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial)
+  ).
 
 
 eliminaRepetidosSeguidos([P1,P2],[P1,P2]) :- P1 \= P2.
