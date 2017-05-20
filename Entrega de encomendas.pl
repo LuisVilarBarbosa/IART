@@ -151,7 +151,8 @@ todasEncomendas(Encs,Opcao,Algoritmo) :-
     (Opcao = minDist,ordenaEncomendasDistancia(Ei,Encomendas,Algoritmo,Sorted))
   ),
   camiao(_,_,CargaMaxima),
-  encomendasCamiao(Sorted,Encs,0,CargaMaxima).
+  encomendasCamiao(Sorted,Encs,0,CargaMaxima),
+  !.
 
 
 todasBombas(Bombas) :-
@@ -214,7 +215,7 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho|R],Autonomia) :-
       bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
       (
         (AutonomiaInicial > CustoBomba,Ei \= Ef);
-        (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,abort)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
+        (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,fail)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
       ),
       (
         (Algoritmo = pp,pp(Ei,Ef,_,Caminho));
@@ -243,7 +244,8 @@ print_time :-
 
 entregaEncomendas(Algoritmo,Opcao) :-
   reset_timer,
-  todasEncomendas(Encomendas,Opcao,Algoritmo),
+  todasEncomendas(EncomendasTemp,Opcao,Algoritmo),
+  sort(EncomendasTemp,Encomendas),
   write('Pontos de entrega: '),write(Encomendas),nl,
   camiao(_,Autonomia,_),
   pontoInicial(Ei),
