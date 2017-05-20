@@ -174,7 +174,8 @@ heuristica(IdPontoGrafo,Hseg) :-
   pontoGrafo(IdPontoGrafo,Long2,Lat2),
   Long is abs(Long2 - Long1),
   Lat is abs(Lat2 - Lat1),
-  Hseg is sqrt(Long * Long + Lat * Lat).
+  Hipotenusa is sqrt(Long * Long + Lat * Lat),
+  Hseg is 40000 * Hipotenusa / 360.
 \end{lstlisting}
 
 Após estar definida a heurística, implementamos o algoritmo \textbf{A*}. Este considera que o valor de cada sucessor é dado pela seguinte função:
@@ -200,8 +201,8 @@ astar(PontoInicial,PontoFinal,Caminho,Custo) :-
 astar(_PontoInicial,E,[C-[E|Cam]-_|_],[E|Cam],C) :- !.
 astar(PontoInicial,PontoFinal,[_-[E|Cam]-G|R],S,C) :-
   findall(F2-[E2|[E|Cam]]-G2,
-  (sucessor(E,E2,C),G2 is G + C,heuristica(E2,H2),F2 is G2 + H2),
-  Lsuc),
+    (sucessor(E,E2,C),G2 is G + C,heuristica(E2,H2),F2 is G2 + H2),
+    Lsuc),
   append(R,Lsuc,L),
   sort(L,Lord),
   astar(PontoInicial,PontoFinal,Lord,S,C).
@@ -266,13 +267,14 @@ Todo o ambiente de desenvolvimento deu-se em \textbf{Windows 10}.
 
 \subsection{Estrutura da aplicação} 
 
-A aplicação referente à solução do problema foi implementada num único ficheiro \textbf{Prolog}, denominado \textbf{Entrega de encomendas.pl}. Inicialmente, é carregado um ficheiro de dados denominado \textbf{data}, que é criado quando executamos o programa de geração de dados. De seguida, encontram-se implementados os quatro algoritmos referidos anteriormente, que são utilizados pelos predicados que resolvem o problema, estando estes implementados a seguir aos algoritmos.
+A aplicação referente à solução do problema foi implementada num único ficheiro \textbf{Prolog}, denominado \textbf{Entrega de encomendas.pl}. Inicialmente, é carregado um ficheiro com factos denominado \textbf{data1}, que é criado quando executamos o programa de geração de dados. De seguida, encontram-se implementados os quatro algoritmos referidos anteriormente, que são utilizados pelos predicados que resolvem o problema, estando estes implementados a seguir aos algoritmos.
 
 Uma vez que se trata de uma implementação em \textbf{Prolog}, consideramos que não faz sentido uma descrição por módulos ou mesmo a demonstração de diagrama de classes.
 
-No entando, o programa de geração de dados, encontra-se dividido em dois ficheiros: DataGenerator.cpp e Node.cpp (com o respetivo .h associado).
-
-ACRESCENTAR MAIS INFORMAÇÃO E TALVEZ DIAGRAMA DE CLASSES ?
+No entando, o programa de geração de dados encontra-se dividido em dois ficheiros: DataGenerator.cpp e Node.cpp (com o respetivo .h associado).
+Este programa é bastante simples: pede ao utilizador o directório de um ficheiro com nomes de clientes, pede o nome do novo ficheiro para onde os dados devem ser enviados e pede um conjunto de informações sobre quantos dados deve gerar e como os deve gerar. Com base nestas informações vai gerar dados aleatórios entre certos intervalos e assegurar que não são gerados factos repetidos.
+O ficheiro gerado pode ser indicado no ficheiro \textbf{Entrega de encomendas.pl} e, assim, ser usado pela aplicação.
+O ficheiro "DataGenerator.cpp" contém toda a lógica do gerador; os ficheiros "Node.cpp" e "Node.h" apenas servem para que se possa guardar os dados de um nó num objecto e que este, ao ser guardado num set, seja único nesse set, dadas as propriedades da classe set.
 
 \subsection{Detalhes relevantes da implementação} 
 
@@ -340,14 +342,26 @@ Análise dos resultados das experiências levadas a cabo
 
 Sugestões para trabalho futuro
 
+No futuro, poder-se-ia permitir o uso de mais do que um camião, calculando-se as encomendas e o percurso de um camião e usando as encomendas restantes para calcular o percurso de outros camiões; o algoritmo de decisão do caminho a seguir também poderia ser melhorado e, com isso, o seu tempo de execução.
+A principal melhoria que se poderia fazer seria mover o projecto para C++ de forma a melhorar consideravelmente o tempo de execução.
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Recursos}
 
-Bibliografia
-Software
-Elementos do grupo: indicar percentagem aproximada de trabalho efectivo de cada elemento do grupo
+\subsection{Bibliografia}
+
+\subsection{Software}
+\begin{itemize}  
+	\item SICStus Prolog VC14 4.3.3
+	\item Notepad++
+	\item Visual Studio Code
+	\item Visual Studio 2017
+\end{itemize}
+
+\subsection{Elementos do grupo}
+Indicar percentagem aproximada de trabalho efectivo de cada elemento do grupo
 
 
 \clearpage
@@ -358,7 +372,7 @@ Elementos do grupo: indicar percentagem aproximada de trabalho efectivo de cada 
 
 \newpage
 \appendix
-\section{Nome do Anexo}
-Código Prolog implementado devidamente comentado e outros elementos úteis que não sejam essenciais ao relatório.
+\section{Apêndice}
+\subsection{Manual do utilizador}
 
 \end{document}
