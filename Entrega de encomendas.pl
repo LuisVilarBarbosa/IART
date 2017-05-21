@@ -10,7 +10,7 @@ sucessor(IdPontoGrafo, IdSucessor, Custo).
 
 :- use_module(library(lists)).
 
-:- load_files(teste).
+:- load_files(dados3).
 
 /* Pesquisa em profundidade */
 pp(Ei,Ef,Custo,Caminho) :-
@@ -192,7 +192,7 @@ calculaCaminhoAux(_,_,[],[]).
 calculaCaminhoAux(Algoritmo,Ei,[E1|Es],[E1-Custo-Caminho|Rs]) :-
   (
     (Algoritmo = pp,pp(Ei,E1,Custo,Caminho));
-    (Algoritmo = astar,write('calcula'),write(Ei), write('-'), write(E1), astar(Ei,E1,Caminho,Custo), write('cheguei'));
+    (Algoritmo = astar, astar(Ei,E1,Caminho,Custo));
     (Algoritmo = pl,pl(Ei,E1,Custo,Caminho));
     (Algoritmo = idastar,idastar(Ei,E1,Custo,Caminho))
   ),

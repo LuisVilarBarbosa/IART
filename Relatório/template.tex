@@ -327,7 +327,63 @@ Terminado o cálculo do caminho desde o ponto inicial até à última encomenda,
 \section{Experiências}
 
 \subsection{Objectivo de cada experiência}
+Foram realizados testes para determinar quanto tempo demoraria cada algoritmo a encontrar o caminho correspondente para cada percurso. Foi medido o tempo de execução dez vezes para cada algoritmo e foi feita a média desses valores, para uma medição mais precisa.
 \subsection{Resultados}
+Para um conjunto de 10 pontos do grafo e 2 encomendas, os tempos obtidos foram:
+
+	• pp(maxEntregas): 6.9ms
+
+	• pp(minDist): 7.7ms
+
+	• pl(maxEntregas): 8.2ms
+
+	• pl(minDist): 7.8ms
+
+	• a*(maxEntregas): 9.8ms
+
+	• a*(minDist): 9.8ms
+
+	• ida*(maxEntregas): 8.6ms
+
+	• ida*(minDist): 8.7ms
+\newline
+
+Para um conjunto de 20 pontos do grafo e 4 encomendas, os tempos obtidos foram:
+
+	• pp(maxEntregas): 54.5ms
+
+	• pp(minDist): 52.3ms
+
+	• pl(maxEntregas): 148.7ms
+
+	• pl(minDist): 153.2ms
+
+	• a*(maxEntregas): --ms
+
+	• a*(minDist): --ms
+
+	• ida*(maxEntregas): --ms
+
+	• ida*(minDist): --ms
+\newline
+
+Para um conjunto de 40 pontos do grafo e X encomendas, os tempos obtidos foram:
+
+	• pp(maxEntregas): --ms
+
+	• pp(minDist): --ms
+
+	• pl(maxEntregas): --ms
+
+	• pl(minDist): --ms
+
+	• a*(maxEntregas): --ms
+
+	• a*(minDist): --ms
+
+	• ida*(maxEntregas): --ms
+
+	• ida*(minDist): --ms
 
 \newpage
 
