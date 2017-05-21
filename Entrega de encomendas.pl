@@ -10,7 +10,7 @@ sucessor(IdPontoGrafo, IdSucessor, Custo).
 
 :- use_module(library(lists)).
 
-:- load_files(dados1).
+:- load_files(dados3).
 
 /* Pesquisa em profundidade */
 pp(Ei,Ef,Custo,Caminho) :-
@@ -192,40 +192,39 @@ calculaCaminhoAux(_,_,[],[]).
 calculaCaminhoAux(Algoritmo,Ei,[E1|Es],[E1-Custo-Caminho|Rs]) :-
   (
     (Algoritmo = pp,pp(Ei,E1,Custo,Caminho));
-    (Algoritmo = astar,astar(Ei,E1,Caminho,Custo));
+    (Algoritmo = astar,write('calcula'),write(Ei), write('-'), write(E1), astar(Ei,E1,Caminho,Custo), write('cheguei'));
     (Algoritmo = pl,pl(Ei,E1,Custo,Caminho));
     (Algoritmo = idastar,idastar(Ei,E1,Custo,Caminho))
   ),
   calculaCaminhoAux(Algoritmo,Ei,Es,Rs).
 
 calculaCaminho(_,_,[],[],_).
-calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho|R],Autonomia) :-
+calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
-  minimo(Resultado,Min,Caminho,Custo),
+  minimo(Resultado,_,_,Custo),
+  Custo > Autonomia,
+  camiao(_,AutonomiaInicial,_),
+  bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
+  write(Ei), write('--'), write(Ef), write('--'), write(CustoBomba), nl,
   (
-    (
-      Custo =< Autonomia,
-      Autonomia2 is Autonomia - Custo,
-      delete(Encomendas,Min,Resto),
-      calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2)
-    );
-    (
-      Custo > Autonomia,
-      camiao(_,AutonomiaInicial,_),
-      bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
-      (
-        (AutonomiaInicial > CustoBomba,Ei \= Ef);
-        (write('Caminho impossivel. Nao existe nenhuma bomba suficiente proxima.'),nl,!,fail)  % Necessario aumentar a autonomia do camião ou ter mais pontos de abastecimento.
-      ),
-      (
-        (Algoritmo = pp,pp(Ei,Ef,_,Caminho));
-        (Algoritmo = pl,pl(Ei,Ef,_,Caminho));
-        (Algoritmo = astar,astar(Ei,Ef,Caminho,_));
-        (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho))
-      ),
-      calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial)
-    )
-  ).
+    (AutonomiaInicial > CustoBomba,Ei \= Ef);
+    (write('Caminho impossivel'),nl,!,abort)
+  ),
+  (
+    (Algoritmo = pp,pp(Ei,Ef,_,Caminho2));
+    (Algoritmo = pl,pl(Ei,Ef,_,Caminho2));
+    (Algoritmo = astar,astar(Ei,Ef,Caminho2,_));
+    (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho2))
+  ),
+  calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial).
+calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
+  calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
+  minimo(Resultado,Min,C,Custo),
+  write(Ei), write('-'), write(Min), write('-'), write(Custo), write('-'), write(Autonomia), nl,
+  Custo =< Autonomia,
+  Autonomia2 is Autonomia - Custo,
+  delete(Encomendas,Min,Resto),
+  calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2).
 
 
 eliminaRepetidosSeguidos([P1,P2],[P1,P2]) :- P1 \= P2.
