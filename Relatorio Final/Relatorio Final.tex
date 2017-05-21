@@ -273,7 +273,7 @@ Uma vez que se trata de uma implementação em \textbf{Prolog}, consideramos que
 
 No entando, o programa de geração de dados encontra-se dividido em dois ficheiros: "DataGenerator.cpp" e "Node.cpp" (com o respetivo .h associado).
 Este programa é bastante simples: pede ao utilizador o directório de um ficheiro com nomes de clientes, pede o nome do novo ficheiro para onde os dados devem ser enviados e pede um conjunto de informações sobre quantos dados deve gerar e como os deve gerar. Com base nestas informações vai gerar dados aleatórios entre certos intervalos e assegurar que não são gerados factos repetidos.
-O ficheiro gerado pode ser indicado no ficheiro \textbf{"Entrega de encomendas.pl"} e, assim, ser usado pela aplicação.
+O ficheiro gerado pode ser indicado no ficheiro "Entrega de encomendas.pl" e, assim, ser usado pela aplicação.
 
 O ficheiro "DataGenerator.cpp" contém toda a lógica do gerador; os ficheiros "Node.cpp" e "Node.h" apenas servem para que se possa guardar os dados de um nó num objecto e que este, ao ser guardado num set, seja único nesse set, dadas as propriedades da classe set.
 
@@ -399,7 +399,9 @@ Para um conjunto de 50 pontos do grafo e 15 encomendas, os tempos obtidos foram:
 
 Como já seria de prever, a experiência que utilizou um menor número de pontos e de encomendas obtém muito mais rapidamente a solução do que quando se dobram estes valores. 
 
-Analisando os tempos medidos, é possível perceber que quando a complexidade do problema aumenta para o dobro, os tempos no algoritmo \textbf{"Primeiro em profundidade"} aumentam para cerca de 7 vezes mais, no \textbf{"Primeiro em largura"} aumentam para cerca de 18 vezes mais, no \textbf{"A*"} para cerca de 10 vezes mais e no \textbf{"IDA*"} para 15 vezes mais.
+Analisando os tempos medidos nas duas primeiras experiências, é possível perceber que quando a complexidade do problema aumenta para o dobro, os tempos no algoritmo \textbf{"Primeiro em profundidade"} aumentam para cerca de 7 vezes mais, no \textbf{"Primeiro em largura"} aumentam para cerca de 18 vezes mais, no \textbf{"A*"} para cerca de 10 vezes mais e no \textbf{"IDA*"} para 15 vezes mais.
+
+Os tempos das outras duas experiências foram medidos usando um processador mais rápido, não sendo possível usá-los para comparação. Para além disso, nem todos os algoritmos foram executados em tempo útil.
 
 Uma vez que o algoritmo \textbf{"Primeiro em profundidade"} não utiliza qualquer tipo de informação e retorna logo o primeiro caminho encontrado, é normal este ser aquele que é mais rápido e que não aumenta tão significativamente com o aumento da dimensão da amostra.
 
@@ -407,7 +409,7 @@ No caso do \textbf{"Primeiro em largura"}, uma vez que percorre horizontalmente 
 
 O \textbf{"A*"}, já sendo um algoritmo de pesquisa informado, na primeira experiência verifica-se que é ligeiramente mais lento a dar um resultado comparativamente aos algoritmos anteriores, devido ao cálculo da heurística e de ter que armazenar toda a informação dos nós, apesar de oferecer um melhor resultado para o caminho. No entanto, este mostra-se melhor que o \textbf{"Primeiro em largura"} na segunda experiência, comprovando a ideia de que os métodos informados sejam melhores quando as amostras são maiores.
 
-Quanto ao \textbf{"IDA*"}, esperava-se que fosse melhor que o \textbf{"A*"}, o que acontece na primeira experiência. No entanto, na segunda já se demonstrou pior, o que pode indicar que quando a amostra é grande não é tão eficaz.
+Quanto ao \textbf{"IDA*"}, esperava-se que fosse melhor que o \textbf{"A*"}, o que acontece na primeira experiência. No entanto, na segunda já se demonstrou pior, o que pode indicar que quando a amostra é grande não é tão eficaz ou que a árvore gerada na segunda experiência não é boa para o uso de pesquisa iterativa em profundidade (com aprofundamento limitado e incremental).
 
 No conjunto com mais dados, pode-se verifcar que a ordem de pesquisa da solução é importante, já que foi possível correr o algoritmo em tempo útil realizando pesquisa em largura, mas tal não foi possível na pesquisa em profundidade. Tal deve estar relacionado com a solução estar num nível próximo da raiz, mas numa posição em relação aos irmãos muito afastada do 1º irmão, sendo que a profundidade da árvore gerada deve ser muito elevada.
 
