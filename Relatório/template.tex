@@ -329,7 +329,7 @@ Pode ocorrer de o programa indicar que encontrou um caminho impossível e contin
 \section{Experiências}
 
 \subsection{Objectivo de cada experiência}
-Foram gerados vários ficheiros de teste, com complexidades crescentes, usando o "DataGenerator". O nome dos ficheiros gerados é "dados*.pl", em que * é um número positivo que cresce conforme aumenta a complexidade. É importante referir que o grau máximo indicado ao gerador de dados nos seus argumentos foi sempre 1, pois corresponde a uma distância bastante grande para um número reduzido de pontos do grafo. Com isto, usámos pontos do grafo que ocupam apenas até 1º de longitude e 1º grau de latitude.
+Foram gerados vários ficheiros de teste, com complexidades crescentes, usando o "DataGenerator". O nome dos ficheiros gerados é "dados*.pl", em que * é um número positivo que cresce conforme aumenta a complexidade. É importante referir que o grau máximo indicado ao gerador de dados nos seus argumentos foi sempre 1, pois corresponde a uma distância bastante grande para um número reduzido de pontos do grafo. Com isto, usámos pontos do grafo que ocupam apenas até 1º de longitude e 1º grau de latitude. Também fizemos pequenas alterações à autonomia e capacidade carga do camião nos ficheiros de dados.
 
 Com este ficheiros, foram realizados testes para determinar quanto tempo demoraria cada algoritmo a encontrar o caminho correspondente para cada percurso. Foi medido o tempo de execução dez vezes para cada algoritmo e foi feita a média desses valores, para uma medição mais precisa.
 \subsection{Resultados}
@@ -392,8 +392,6 @@ Quanto ao \textbf{"IDA*"}, esperava-se que fosse melhor que o \textbf{"A*"}, o q
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Melhoramentos}
 
-Sugestões para trabalho futuro
-
 No futuro, poder-se-iam realizar as seguintes melhorias:
 \begin{itemize}
 	\item permitir o uso de mais do que um camião, calculando-se as encomendas e o percurso de um camião e usando as encomendas restantes para calcular o percurso de outros camiões;
@@ -409,7 +407,7 @@ No futuro, poder-se-iam realizar as seguintes melhorias:
 
 \subsection{Bibliografia}
 \begin{itemize}
-	\item Slides teóricos da cadeira, relativos aos "Métodos de Resolução de Problemas e Algoritmos para a Evolução"
+	\item Slides teóricos da unidade curricular, relativos aos "Métodos de Resolução de Problemas e Algoritmos para a Evolução"
 \end{itemize}
 
 \subsection{Software}
@@ -427,5 +425,19 @@ O grupo trabalhou sempre em conjunto, de forma a que cada elemento ficasse com u
 \appendix
 \section{Apêndice}
 \subsection{Manual do utilizador}
+
+Para utilizar o programa basta chamar um dos seguintes predicados:
+\begin{itemize}
+	\item entregaEncomendas(pp, maxEntregas).
+	\item entregaEncomendas(pp, minDist).
+	\item entregaEncomendas(pl, maxEntregas).
+	\item entregaEncomendas(pl, minDist).
+	\item entregaEncomendas(astar, maxEntregas).
+	\item entregaEncomendas(astar, minDist).
+	\item entregaEncomendas(idastar, maxEntregas).
+	\item entregaEncomendas(idastar, minDist).
+\end{itemize}
+
+O primeiro argumento do predicado corresponde ao algoritmo que se deseja utilizar: primeiro em profundidade (pp), primeiro em largura (pl), A* (astar) ou IDA* (idastar). Quanto ao segundo argumento, indica o objectivo, isto é, se deve maximizar o número de entregas (maxEntregas) ou minimizar a distância (minDist).
 
 \end{document}
