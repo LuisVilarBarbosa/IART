@@ -271,7 +271,7 @@ A aplicação referente à solução do problema foi implementada num único fic
 
 Uma vez que se trata de uma implementação em \textbf{Prolog}, consideramos que não faz sentido uma descrição por módulos ou mesmo a demonstração de diagrama de classes.
 
-No entando, o programa de geração de dados encontra-se dividido em dois ficheiros: DataGenerator.cpp e Node.cpp (com o respetivo .h associado).
+No entando, o programa de geração de dados encontra-se dividido em dois ficheiros: "DataGenerator.cpp" e "Node.cpp" (com o respetivo .h associado).
 Este programa é bastante simples: pede ao utilizador o directório de um ficheiro com nomes de clientes, pede o nome do novo ficheiro para onde os dados devem ser enviados e pede um conjunto de informações sobre quantos dados deve gerar e como os deve gerar. Com base nestas informações vai gerar dados aleatórios entre certos intervalos e assegurar que não são gerados factos repetidos.
 O ficheiro gerado pode ser indicado no ficheiro \textbf{"Entrega de encomendas.pl"} e, assim, ser usado pela aplicação.
 
@@ -321,13 +321,17 @@ Este vai colocar em Ef qual é a bomba mais próxima do ponto em que o camião s
 
 Terminado o cálculo do caminho desde o ponto inicial até à última encomenda, falta ainda o camião deslocar-se desde a última encomenda até ao ponto final. Desta forma, vai-se buscar qual foi a última entrega e adiciona-se à lista de encomendas o valor do ponto final, chamando novamente o predicado calculaCaminho, agora com ponto inicial correspondente à última entrega, e ponto final correspondente.
 
+Pode ocorrer de o programa indicar que encontrou um caminho impossível e continuar a correr. Se tal acontecer, quer dizer que está a tentar gerar outro caminho. Esta situação pode ocorrer várias vezes numa só execução.
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiências}
 
 \subsection{Objectivo de cada experiência}
-Foram realizados testes para determinar quanto tempo demoraria cada algoritmo a encontrar o caminho correspondente para cada percurso. Foi medido o tempo de execução dez vezes para cada algoritmo e foi feita a média desses valores, para uma medição mais precisa.
+Foram gerados vários ficheiros de teste, com complexidades crescentes, usando o "DataGenerator". O nome dos ficheiros gerados é "dados*.pl", em que * é um número positivo que cresce conforme aumenta a complexidade. É importante referir que o grau máximo indicado ao gerador de dados nos seus argumentos foi sempre 1, pois corresponde a uma distância bastante grande para um número reduzido de pontos do grafo. Com isto, usámos pontos do grafo que ocupam apenas até 1º de longitude e 1º grau de latitude.
+
+Com este ficheiros, foram realizados testes para determinar quanto tempo demoraria cada algoritmo a encontrar o caminho correspondente para cada percurso. Foi medido o tempo de execução dez vezes para cada algoritmo e foi feita a média desses valores, para uma medição mais precisa.
 \subsection{Resultados}
 Para um conjunto de 10 pontos do grafo e 2 encomendas, os tempos obtidos foram:
 
