@@ -10,7 +10,7 @@ sucessor(IdPontoGrafo, IdSucessor, Custo).
 
 :- use_module(library(lists)).
 
-:- load_files(dados3).
+:- load_files(teste).
 
 /* Pesquisa em profundidade */
 pp(Ei,Ef,Custo,Caminho) :-
@@ -199,6 +199,14 @@ calculaCaminhoAux(Algoritmo,Ei,[E1|Es],[E1-Custo-Caminho|Rs]) :-
   calculaCaminhoAux(Algoritmo,Ei,Es,Rs).
 
 calculaCaminho(_,_,[],[],_).
+calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
+  calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
+  minimo(Resultado,Min,C,Custo),
+  write(Ei), write('-'), write(Min), write('-'), write(Custo), write('-'), write(Autonomia), nl,
+  Custo =< Autonomia,
+  Autonomia2 is Autonomia - Custo,
+  delete(Encomendas,Min,Resto),
+  calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2).
 calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
   minimo(Resultado,_,_,Custo),
@@ -217,14 +225,6 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
     (Algoritmo = idastar,idastar(Ei,Ef,_,Caminho2))
   ),
   calculaCaminho(Algoritmo,Ef,Encomendas,R,AutonomiaInicial).
-calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
-  calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
-  minimo(Resultado,Min,C,Custo),
-  write(Ei), write('-'), write(Min), write('-'), write(Custo), write('-'), write(Autonomia), nl,
-  Custo =< Autonomia,
-  Autonomia2 is Autonomia - Custo,
-  delete(Encomendas,Min,Resto),
-  calculaCaminho(Algoritmo,Min,Resto,R,Autonomia2).
 
 
 eliminaRepetidosSeguidos([P1,P2],[P1,P2]) :- P1 \= P2.
