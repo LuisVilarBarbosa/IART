@@ -364,37 +364,28 @@ Para um conjunto de 20 pontos do grafo e 4 encomendas, os tempos obtidos foram:
 
 	• a*(maxEntregas): 102ms
 
-	• a*(minDist):114.7-ms
+	• a*(minDist): 114.7ms
 
 	• ida*(maxEntregas): 150.5ms
 
 	• ida*(minDist): 114.7ms
-\newline
-
-Para um conjunto de 40 pontos do grafo e X encomendas, os tempos obtidos foram:
-
-	• pp(maxEntregas): --ms
-
-	• pp(minDist): --ms
-
-	• pl(maxEntregas): --ms
-
-	• pl(minDist): --ms
-
-	• a*(maxEntregas): --ms
-
-	• a*(minDist): --ms
-
-	• ida*(maxEntregas): --ms
-
-	• ida*(minDist): --ms
 
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusões}
 
-Análise dos resultados das experiências levadas a cabo
+Como já seria de prever, a experiência que utilizou um menor número de pontos e de encomendas obtém muito mais rapidamente a solução do que quando se dobram estes valores. 
+
+Analisando os tempos medidos, é possível perceber que quando a complexidade do problema aumenta para o dobro, os tempos no algoritmo \textbf{"Primeiro em profundidade"} aumentam para cerca de 7 vezes mais, no \textbf{"Primeiro em largura"} aumentam para cerca de 18 vezes mais, no \textbf{"A*"} para cerca de 10 vezes mais e no \textbf{"IDA*"} para 15 vezes mais.
+
+Uma vez que o algoritmo \textbf{"Primeiro em profundidade"} não utiliza qualquer tipo de informação e retorna logo o primeiro caminho encontrado, é normal este ser aquele que é mais rápido e que não aumenta tão significativamente com o aumento da dimensão da amostra.
+
+No caso do \textbf{"Primeiro em largura"}, uma vez que percorre horizontalmente todo o grafo, é normal demorar mais que o anterior até encontrar uma solução, principalmente se esta não for tão direta.
+
+O \textbf{"A*"}, já sendo um algoritmo de pesquisa informado, na primeira experiência verifica-se que é ligeiramente mais lento a dar um resultado comparativamente aos algoritmos anteriores, devido ao cálculo da heurística e de ter que armazenar toda a informação dos nós, apesar de oferecer um melhor resultado para o caminho. No entanto, este mostra-se melhor que o \textbf{"Primeiro em largura"} na segunda experiência, comprovando a ideia de que os métodos informados sejam melhores quando as amostras são maiores.
+
+Quanto ao \textbf{"IDA*"}, esperava-se que fosse melhor que o \textbf{"A*"}, o que acontece na primeira experiência. No entanto, na segunda já se demonstrou pior, o que pode indicar que quando a amostra é grande não é tão eficaz.
 
 \newpage
 
@@ -403,7 +394,7 @@ Análise dos resultados das experiências levadas a cabo
 
 Sugestões para trabalho futuro
 
-No futuro, poder-se-ia relizar as seguintes melhorias:
+No futuro, poder-se-iam realizar as seguintes melhorias:
 \begin{itemize}
 	\item permitir o uso de mais do que um camião, calculando-se as encomendas e o percurso de um camião e usando as encomendas restantes para calcular o percurso de outros camiões;
 	\item melhorar o algoritmo de decisão do caminho a seguir, sendo que, com isso, o seu tempo de execução também melhoraria;
@@ -417,6 +408,9 @@ No futuro, poder-se-ia relizar as seguintes melhorias:
 \section{Recursos}
 
 \subsection{Bibliografia}
+\begin{itemize}
+	\item Slides teóricos da cadeira, relativos aos "Métodos de Resolução de Problemas e Algoritmos para a Evolução"
+\end{itemize}
 
 \subsection{Software}
 \begin{itemize}
@@ -427,14 +421,7 @@ No futuro, poder-se-ia relizar as seguintes melhorias:
 \end{itemize}
 
 \subsection{Elementos do grupo}
-Indicar percentagem aproximada de trabalho efectivo de cada elemento do grupo
-
-
-\clearpage
-\addcontentsline{toc}{section}{Bibliografia}
-\renewcommand\refname{Bibliografia}
-\bibliographystyle{plain}
-\bibliography{myrefs}
+O grupo trabalhou sempre em conjunto, de forma a que cada elemento ficasse com uma carga igual e justa. Desta forma, pode-se afirmar que cada elemento tem uma percentagem aproximada de 33,3\%.
 
 \newpage
 \appendix

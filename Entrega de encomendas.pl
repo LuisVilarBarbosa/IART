@@ -202,7 +202,6 @@ calculaCaminho(_,_,[],[],_).
 calculaCaminho(Algoritmo,Ei,Encomendas,[C|R],Autonomia) :-
   calculaCaminhoAux(Algoritmo,Ei,Encomendas,Resultado),
   minimo(Resultado,Min,C,Custo),
-  write(Ei), write('-'), write(Min), write('-'), write(Custo), write('-'), write(Autonomia), nl,
   Custo =< Autonomia,
   Autonomia2 is Autonomia - Custo,
   delete(Encomendas,Min,Resto),
@@ -213,7 +212,6 @@ calculaCaminho(Algoritmo,Ei,Encomendas,[Caminho2|R],Autonomia) :-
   Custo > Autonomia,
   camiao(_,AutonomiaInicial,_),
   bombaMaisPerto(Algoritmo,Ei,Ef,CustoBomba),
-  write(Ei), write('--'), write(Ef), write('--'), write(CustoBomba), nl,
   (
     (AutonomiaInicial > CustoBomba,Ei \= Ef);
     (write('Caminho impossivel'),nl,!,abort)
