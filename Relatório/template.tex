@@ -24,7 +24,7 @@
 }
 
 \author{\textbf{Grupo A4\_4:}\\ Luís  Barbosa - 201405729 - up201405729@fe.up.pt\\ Paulo Santos - 201403745 - up201403745@fe.up.pt \\ Sérgio Ferreira - 201403074 - up201403074@fe.up.pt \\\linebreak\linebreak \\
- \\ Faculdade de Engenharia da Universidade do Porto \\ Rua Roberto Frias, s\/n, 4200-465 Porto, Portugal \linebreak\linebreak\linebreak
+ \\ Faculdade de Engenharia da Universidade do Porto \\ Rua Roberto Frias, s/n, 4200-465 Porto, Portugal \linebreak\linebreak\linebreak
 \linebreak\linebreak\vspace{1cm}}
 \date{21 de Maio de 2017}
 \maketitle
@@ -65,9 +65,9 @@ Para a distribuição de encomendas, numa certa região, são necessários vári
 
 \centerline{\textbf{camiao(Id, Autonomia, CargaMaxima).}}
 
-Num dia de trabalho, o motorista de um camião percorre, em média, 500 quilómetros. É importante ter em conta que um camião nunca deve ficar sem combustível, podendo efetuar um abastecimento em certos pontos do mapa. 
+Num dia de trabalho, o motorista de um camião percorre, em média, 500 quilómetros. É importante ter em conta que um camião nunca deve ficar sem combustível, podendo abastecer em certos pontos do mapa. 
 
-Para representar os pontos de um mapa, que irão corresponder aos locais onde serão feitas as entregas ou onde se localizam os postos de abastecimento, implementou-se o seguinte predicado:
+Para representar os pontos de um mapa, que irão corresponder aos locais onde serão feitas as entregas ou onde se localizam os postos de abastecimento, implementou-se o seguinte predicado que contém um identificador e uma longitude e uma latitude em graus:
 
 \centerline{\textbf{pontoGrafo(Id, Long, Lat).}}
 
@@ -87,7 +87,7 @@ As encomendas que serão distribuídas são definidas pelo seguinte predicado:
 
 Desta forma, cada estado do problema de pesquisa irá ser representado por um PontoGrafo.
 
-A função de transição que consideramos adequada corresponde a um facto que se refere a uma aresta do grafo. Esta aresta será representada por um facto com a seguinte definição:
+A função de transição que consideramos adequada corresponde a um facto que se refere a uma aresta do grafo. Esta aresta será representada por um facto com a seguinte definição em que o custo está em quilómetros:
 
 \centerline{\textbf{sucessor(IdPontoGrafo, IdSucessor, Custo).}}
 
@@ -116,9 +116,9 @@ r - fator de ramificação média;
 
 p - profundidade máxima;
 
-O algoritmo, para cada rama, terá de o percorrer até à sua profundidade máxima (p), ou seja, terá complexidade temporal O(r \^ p).
+O algoritmo, para cada ramo, terá de o percorrer até à sua profundidade máxima (p), ou seja, terá complexidade temporal O($r ^ p$).
 
-Por outro lado, apenas necessita de armazenar o estado dos filhos dos nós que fazem parte da solução atual, ou seja, a sua complexidade espacial será apenas O(r x p).
+Por outro lado, apenas necessita de armazenar o estado dos filhos dos nós que fazem parte da solução atual, ou seja, a sua complexidade espacial será apenas O($r * p$).
 
 Não é considerado um algoritmo completo, uma vez que poderia nunca chegar a encontrar uma solução caso o caminho fosse infinitamente grande.
 
@@ -149,7 +149,7 @@ pl([La|OLs],Ef,L) :-
   pl(NL,Ef,L).
 \end{lstlisting}
 
-Este algoritmo apenas visita a árvore até à profundidade da solução, fazendo com que a complexidade temporal seja O(r\^p), assim como a complexidade espacial, uma vez que a fila vai ter de armazenar todos os nós do nível da solução.
+Este algoritmo apenas visita a árvore até à profundidade da solução, fazendo com que a complexidade temporal seja O($r ^ p$), assim como a complexidade espacial, uma vez que a fila vai ter de armazenar todos os nós do nível da solução.
 
 Se todas as arestas possuíssem o mesmo custo, o algoritmo seria considerado ótimo, pois a primeira solução encontrada seria necessariamente a melhor, apesar de não ser o caso. No entanto, considera-se que é um algoritmo completo, uma vez que r é finito.
 
@@ -165,7 +165,7 @@ Uma vez que uma função heurística não deve ser uma função qualquer, tentam
 
 - Ser consistente (monótona).
 
-Uma vez que o nosso problema se trata de distâncias físicas entre pontos, consideramos que a função heurística mais adequada seria a distância em linha reta entre os 2 pontos. Esta heurística é claramente otimista, uma vez que não é possível a distância real ser menor que a nossa função.
+Uma vez que o nosso problema se trata de distâncias físicas entre pontos, consideramos que a função heurística mais adequada seria a distância em linha reta entre os 2 pontos. Esta heurística é claramente otimista, uma vez que não é possível a distância real ser menor que a nossa função. A heurística calcula a distância em graus entre dois pontos na Terra e converte essa distância para quilómetros. Para simplificar, não considera arcos entre dois pontos, mas sim rectas.
 
 \begin{lstlisting}[language=Prolog,xleftmargin=.1\textwidth]
 heuristica(IdPontoGrafo,Hseg) :-
@@ -190,7 +190,7 @@ Este algoritmo recorre a duas listas:
 
 - Lista fechada: Nós já expandidos.
 
-Inicialmente, a lista aberta contém apenas o estado inicial, e a lista fechada está vazia. Caso a lista aberta esteja vazia, o algoritmo termina. Retira-se o primeiro estado da lista aberta e adiciona-se este à lista fechada. Se o estado for o estado final, o algoritmo retorna. Caso contrário, para cada sucessor que não esteja na lista fechada, calcula-se o seu possível novo valor estimado e se o sucessor não estiver na lista aberta ou o novo valor for melhor que o valor anterior, o sucessor é adicionado à lista aberta. Repete-se o algoritmo até este terminar.
+Inicialmente, a lista aberta contém apenas o estado inicial e a lista fechada está vazia. Caso a lista aberta esteja vazia, o algoritmo termina. Se não, retira-se o primeiro estado da lista aberta e adiciona-se este à lista fechada. Se o estado for o estado final, o algoritmo retorna. Caso contrário, para cada sucessor que não esteja na lista fechada, calcula-se o seu possível novo valor estimado e se o sucessor não estiver na lista aberta ou o novo valor for melhor que o valor anterior, o sucessor é adicionado à lista aberta. Repete-se o algoritmo até este terminar.
 
 \begin{lstlisting}[language=Prolog]
 astar(PontoInicial,PontoFinal,Caminho,Custo) :-
@@ -259,7 +259,7 @@ update_next_bound(H) :-
 
 \subsection{Ferramentas/APIs utilizadas} 
 
-Para o desenvolvimento de uma solução para o problema apresentado, o grupo decidiu que seria uma boa ideia tirar partido das funcionalidades da linguagem \textbf{Prolog} para implementar tanto os algoritmos como os predicados que solucionam o enunciado em questão. Este código foi desenvolvido em \textbf{Notepad++}, fazendo uso de um ficheiro que continha a linguagem Prolog para o IDE em questão, de forma a fornecer uma melhor identação do código. Para compilar e correr o programa, utilizou-se \textbf{SICStus Prolog VC14 4.3.3}.
+Para o desenvolvimento de uma solução para o problema apresentado, o grupo decidiu que seria uma boa ideia tirar partido das funcionalidades da linguagem \textbf{Prolog} para implementar tanto os algoritmos como os predicados que solucionam o enunciado em questão. Este código foi desenvolvido em \textbf{Notepad++}, fazendo uso de um ficheiro que continha a síntaxe da linguagem \textbf{Prolog} para o IDE em questão, de forma a fornecer uma melhor legibilidade do código. Para compilar e correr o programa, utilizou-se \textbf{SICStus Prolog VC14 4.3.3}.
 
 Além da solução em si, e de forma a facilitar o teste desta, o grupo implementou um programa gerador de dados que construísse vários factos com informações pertinentes para o problema. Este programa foi implementado em \textbf{C++}, fazendo-se uso do \textbf{Visual Studio 2017}.
 
@@ -267,18 +267,19 @@ Todo o ambiente de desenvolvimento deu-se em \textbf{Windows 10}.
 
 \subsection{Estrutura da aplicação} 
 
-A aplicação referente à solução do problema foi implementada num único ficheiro \textbf{Prolog}, denominado \textbf{Entrega de encomendas.pl}. Inicialmente, é carregado um ficheiro com factos denominado \textbf{data1}, que é criado quando executamos o programa de geração de dados. De seguida, encontram-se implementados os quatro algoritmos referidos anteriormente, que são utilizados pelos predicados que resolvem o problema, estando estes implementados a seguir aos algoritmos.
+A aplicação referente à solução do problema foi implementada num único ficheiro \textbf{Prolog}, denominado \textbf{"Entrega de encomendas.pl"}. Inicialmente, é carregado um ficheiro com factos denominado \textbf{"data1.pl"}, que foi criado usando o programa de geração de dados. De seguida, encontram-se implementados os quatro algoritmos referidos anteriormente, que são utilizados pelos predicados que resolvem o problema, estando estes implementados a seguir aos algoritmos.
 
 Uma vez que se trata de uma implementação em \textbf{Prolog}, consideramos que não faz sentido uma descrição por módulos ou mesmo a demonstração de diagrama de classes.
 
 No entando, o programa de geração de dados encontra-se dividido em dois ficheiros: DataGenerator.cpp e Node.cpp (com o respetivo .h associado).
 Este programa é bastante simples: pede ao utilizador o directório de um ficheiro com nomes de clientes, pede o nome do novo ficheiro para onde os dados devem ser enviados e pede um conjunto de informações sobre quantos dados deve gerar e como os deve gerar. Com base nestas informações vai gerar dados aleatórios entre certos intervalos e assegurar que não são gerados factos repetidos.
-O ficheiro gerado pode ser indicado no ficheiro \textbf{Entrega de encomendas.pl} e, assim, ser usado pela aplicação.
+O ficheiro gerado pode ser indicado no ficheiro \textbf{"Entrega de encomendas.pl"} e, assim, ser usado pela aplicação.
+
 O ficheiro "DataGenerator.cpp" contém toda a lógica do gerador; os ficheiros "Node.cpp" e "Node.h" apenas servem para que se possa guardar os dados de um nó num objecto e que este, ao ser guardado num set, seja único nesse set, dadas as propriedades da classe set.
 
 \subsection{Detalhes relevantes da implementação} 
 
-Passando para a descrição da implementação da solução, esta é realizada através da chamada ao seguinte predicado principal:
+Passando para a descrição da implementação da solução, esta é realizada através da chamada ao seguinte predicado:
 
 \centerline{\textbf{entregaEncomendas(Algoritmo,Opcao).}}
 
@@ -310,7 +311,7 @@ Com esta lista, chama-se o predicado
 
 \centerline{\textbf{minimo(Resultado,Min,C,Custo).}}
 
-que vai buscar qual é o caminho para a encomenda que possui menor custo, desde o ponto inicial. De seguida, é apagada a encomenda para o qual foi encontrado o melhor caminho, sendo o predicado \textbf{calculaCaminho} chamado novamente, mas agora o ponto inicial corresponde à encomenda que foi escolhida anteriormente, sendo todo este processo repetido para encontrar o melhor caminho desde essa encomenda até a uma nova futura encomenda.
+que vai buscar qual é o caminho para a encomenda que possui menor custo, desde o ponto inicial. De seguida, é apagada a encomenda para a qual foi encontrado o melhor caminho, sendo o predicado \textbf{calculaCaminho} chamado novamente, mas agora o ponto inicial corresponde à encomenda que foi escolhida anteriormente, sendo todo este processo repetido para encontrar o melhor caminho desde essa encomenda até a uma nova futura encomenda.
 
 É importante realçar que antes da chamada recursiva é efetuada a verificação se o camião possui autonomia suficiente para se deslocar desde o ponto onde se encontra até ao ponto seguinte. Se for possível, essa distância é deduzida na sua autonomia. Caso não seja possível, chama-se o seguinte predicado:
 
@@ -325,8 +326,8 @@ Terminado o cálculo do caminho desde o ponto inicial até à última encomenda,
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiências}
 
-Objectivo de cada experiência
-Resultados
+\subsection{Objectivo de cada experiência}
+\subsection{Resultados}
 
 \newpage
 
@@ -342,8 +343,13 @@ Análise dos resultados das experiências levadas a cabo
 
 Sugestões para trabalho futuro
 
-No futuro, poder-se-ia permitir o uso de mais do que um camião, calculando-se as encomendas e o percurso de um camião e usando as encomendas restantes para calcular o percurso de outros camiões; o algoritmo de decisão do caminho a seguir também poderia ser melhorado e, com isso, o seu tempo de execução.
-A principal melhoria que se poderia fazer seria mover o projecto para C++ de forma a melhorar consideravelmente o tempo de execução.
+No futuro, poder-se-ia relizar as seguintes melhorias:
+\begin{itemize}
+	\item permitir o uso de mais do que um camião, calculando-se as encomendas e o percurso de um camião e usando as encomendas restantes para calcular o percurso de outros camiões;
+	\item melhorar o algoritmo de decisão do caminho a seguir, sendo que, com isso, o seu tempo de execução também melhoraria;
+	\item conseguir que a última encomenda a entregar estivesse o mais próximo possível do ponto final;
+	\item mover o projecto para C++ de forma a melhorar consideravelmente o tempo de execução.
+\end{itemize}
 
 \newpage
 
@@ -353,7 +359,7 @@ A principal melhoria que se poderia fazer seria mover o projecto para C++ de for
 \subsection{Bibliografia}
 
 \subsection{Software}
-\begin{itemize}  
+\begin{itemize}
 	\item SICStus Prolog VC14 4.3.3
 	\item Notepad++
 	\item Visual Studio Code
